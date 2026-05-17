@@ -53,6 +53,25 @@ const config: Config = {
         sans: ['"Anek Tamil"', "sans-serif"],
         serif: ['"Playfair Display"', "serif"],
       },
+      keyframes: {
+        fadeUp: {
+          '0%': { opacity: '0', transform: 'translateY(20px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        pulseDot: {
+          '0%, 100%': { opacity: '1', transform: 'scale(1)' },
+          '50%': { opacity: '0.3', transform: 'scale(1.2)' },
+        },
+        shimmerSweep: {
+          '0%': { backgroundPosition: '200% center' },
+          '100%': { backgroundPosition: '-200% center' },
+        },
+      },
+      animation: {
+        'fade-up': 'fadeUp 400ms ease-out forwards',
+        'pulse-dot': 'pulseDot 1.5s infinite',
+        'shimmer-sweep': 'shimmerSweep 3s linear infinite',
+      },
     },
   },
   plugins: [],
