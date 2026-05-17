@@ -1,3 +1,4 @@
+@import "tw-animate-css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -51,11 +52,132 @@
     font-family: "Playfair Display", serif;
     font-optical-sizing: auto;
   }
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+  .theme {
+    --font-heading: var(--font-sans);
+    --font-sans: var(--font-sans);
+  }
+  :root {
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.145 0 0);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.145 0 0);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.145 0 0);
+    --primary: oklch(0.205 0 0);
+    --primary-foreground: oklch(0.985 0 0);
+    --secondary: oklch(0.97 0 0);
+    --secondary-foreground: oklch(0.205 0 0);
+    --muted: oklch(0.97 0 0);
+    --muted-foreground: oklch(0.556 0 0);
+    --accent: oklch(0.97 0 0);
+    --accent-foreground: oklch(0.205 0 0);
+    --destructive: oklch(0.577 0.245 27.325);
+    --border: oklch(0.922 0 0);
+    --input: oklch(0.922 0 0);
+    --ring: oklch(0.708 0 0);
+    --chart-1: oklch(0.87 0 0);
+    --chart-2: oklch(0.556 0 0);
+    --chart-3: oklch(0.439 0 0);
+    --chart-4: oklch(0.371 0 0);
+    --chart-5: oklch(0.269 0 0);
+    --radius: 0.625rem;
+    --sidebar: oklch(0.985 0 0);
+    --sidebar-foreground: oklch(0.145 0 0);
+    --sidebar-primary: oklch(0.205 0 0);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.97 0 0);
+    --sidebar-accent-foreground: oklch(0.205 0 0);
+    --sidebar-border: oklch(0.922 0 0);
+    --sidebar-ring: oklch(0.708 0 0);
+  }
+  .dark {
+    --background: oklch(0.145 0 0);
+    --foreground: oklch(0.985 0 0);
+    --card: oklch(0.205 0 0);
+    --card-foreground: oklch(0.985 0 0);
+    --popover: oklch(0.205 0 0);
+    --popover-foreground: oklch(0.985 0 0);
+    --primary: oklch(0.922 0 0);
+    --primary-foreground: oklch(0.205 0 0);
+    --secondary: oklch(0.269 0 0);
+    --secondary-foreground: oklch(0.985 0 0);
+    --muted: oklch(0.269 0 0);
+    --muted-foreground: oklch(0.708 0 0);
+    --accent: oklch(0.269 0 0);
+    --accent-foreground: oklch(0.985 0 0);
+    --destructive: oklch(0.704 0.191 22.216);
+    --border: oklch(1 0 0 / 10%);
+    --input: oklch(1 0 0 / 15%);
+    --ring: oklch(0.556 0 0);
+    --chart-1: oklch(0.87 0 0);
+    --chart-2: oklch(0.556 0 0);
+    --chart-3: oklch(0.439 0 0);
+    --chart-4: oklch(0.371 0 0);
+    --chart-5: oklch(0.269 0 0);
+    --sidebar: oklch(0.205 0 0);
+    --sidebar-foreground: oklch(0.985 0 0);
+    --sidebar-primary: oklch(0.488 0.243 264.376);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.269 0 0);
+    --sidebar-accent-foreground: oklch(0.985 0 0);
+    --sidebar-border: oklch(1 0 0 / 10%);
+    --sidebar-ring: oklch(0.556 0 0);
+  }
+  * {
+    @apply border-bg-border;
+  }
+  html {
+    @apply font-sans;
+  }
+  body {
+    color: var(--text-primary);
+    background: var(--bg-page);
+    font-family: "Anek Tamil", sans-serif;
+    font-optical-sizing: auto;
+    font-variation-settings: "wdth" 100;
+  }
+  h1, h2, h3, h4, h5, h6, .font-serif {
+    font-family: "Playfair Display", serif;
+    font-optical-sizing: auto;
   }
 }
 
+
+/* JothiSoft — Magnetic Dock theme override */
+.jothisoft-dock {
+  background: rgba(30, 21, 10, 0.85) !important;
+  backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(74, 56, 40, 0.6) !important;
+  border-radius: 20px !important;
+}
+
+/* Tooltip label — Tamil-friendly font */
+.jothisoft-dock button > div.absolute.-top-10 {
+  font-family: 'Anek Tamil', sans-serif !important;
+  font-size: 12px !important;
+  background: rgba(36, 26, 15, 0.95) !important;
+  border: 1px solid rgba(74, 56, 40, 0.8) !important;
+  color: #f5e6c8 !important;
+  border-radius: 8px !important;
+}
+
+.jothisoft-dock button > div.absolute.-top-10 > div {
+  background: rgba(36, 26, 15, 0.95) !important;
+  border-color: rgba(74, 56, 40, 0.8) !important;
+}
+
+.magnetic-dock-container,
+[class*="dock"] {
+  background: rgba(26, 18, 9, 0.82) !important;
+  border: 1px solid rgba(74, 56, 40, 0.55) !important;
+  backdrop-filter: blur(20px) !important;
+}
+
+/* Hide quick strip scrollbar all browsers */
+.overflow-x-auto::-webkit-scrollbar { display: none; }
+
+/* LIVE dot pulse */
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(1.3); }
+}

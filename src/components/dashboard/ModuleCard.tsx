@@ -1,55 +1,80 @@
-import React from 'react';
-import Link from 'next/link';
-import { LucideIcon } from 'lucide-react';
-import { Badge } from '@/components/ui';
+'use client'
 
-export interface ModuleCardProps {
-  icon: LucideIcon;
-  label: string;          // Tamil label
-  sublabel?: string;      // English sublabel (optional)
-  badge?: 'NEW' | 'PRO' | 'PREMIUM' | 'FREE';
-  categoryColor: string;  // CSS var or hex
-  href: string;
-  gradient: string;       // tailwind gradient classes or inline style
+import Link from 'next/link'
+import { LucideIcon } from 'lucide-react'
+import clsx from 'clsx'
+
+interface ModuleCardProps {
+  icon: LucideIcon
+  label: string
+  sublabel?: string
+  badge?: 'NEW' | 'PRO' | 'PREMIUM' | 'FREE' | 'TOP'
+  colorHex: string
+  href: string
 }
 
-export function ModuleCard({ icon: Icon, label, sublabel, badge, categoryColor, href, gradient }: ModuleCardProps) {
+const BADGE_STYLES: Record<string, string> = {
+  NEW:     'bg-[rgba(46,125,107,0.2)] text-[#5dcaa5]',
+  TOP:     'bg-[rgba(46,125,107,0.2)] text-[#5dcaa5]',
+  PRO:     'bg-[rgba(123,94,167,0.2)] text-[#afa9ec]',
+  PREMIUM: 'bg-[rgba(201,146,42,0.2)] text-[#f2c96a]',
+  FREE:    'bg-[rgba(74,56,40,0.4)] text-[#8a7060]',
+}
+
+export function ModuleCard({
+  icon: Icon,
+  label,
+  sublabel,
+  badge,
+  colorHex,
+  href,
+}: ModuleCardProps) {
   return (
-    <Link 
+    <Link
       href={href}
-      className="group relative flex flex-col items-center p-4 bg-bg-card border border-bg-border rounded-xl transition-all duration-200 hover:-translate-y-[2px] active:scale-95"
+      className="group relative flex flex-col items-center gap-[5px] rounded-[var(--radius-md)] py-[10px] px-[5px] transition-all duration-200 hover:-translate-y-[2px] active:scale-[0.97]"
       style={{
-        boxShadow: `0 0 0 rgba(0,0,0,0)`,
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.boxShadow = `0 4px 12px ${categoryColor.replace('var(', '').replace(')', '')}4d`; // 0.3 opacity hex equivalent is ~4d, but relying on CSS var replacement might be tricky. Better to just use a custom property if needed, or stick to a solid color variable. Since categoryColor is "var(--cat-...)", we can use it directly in boxShadow if we compose it, but wait, rgba(var(--cat-r,g,b), 0.3) would be better. Let's just use CSS variable directly or trust the browser. Actually, we can just use a standard shadow with the color.
-        e.currentTarget.style.borderColor = categoryColor;
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.boxShadow = `none`;
-        e.currentTarget.style.borderColor = 'var(--bg-border)';
+        background: 'var(--bg-card)',
+        border: '1px solid var(--bg-border)',
       }}
     >
+      {/* Hover glow */}
+      <div
+        className="absolute inset-0 rounded-[var(--radius-md)] opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none"
+        style={{ boxShadow: `0 6px 20px ${colorHex}18` }}
+      />
+
       {badge && (
-        <div className="absolute top-2 right-2">
-          {badge === 'NEW' && <Badge className="bg-gold-deep text-text-inverse">{badge}</Badge>}
-          {badge === 'PRO' && <Badge className="bg-cat-horoscope text-white">{badge}</Badge>}
-          {badge === 'PREMIUM' && <Badge className="bg-gradient-to-r from-gold-deep to-gold-bright text-text-inverse">{badge}</Badge>}
-          {badge === 'FREE' && <Badge className="bg-bg-active text-text-muted">{badge}</Badge>}
-        </div>
+        <span
+          className={clsx(
+            'absolute top-[4px] right-[4px] text-[8px] font-bold px-[5px] py-[1px] rounded-pill',
+            BADGE_STYLES[badge]
+          )}
+        >
+          {badge}
+        </span>
       )}
 
-      <div 
-        className="w-14 h-14 rounded-full flex items-center justify-center mb-3 transition-transform duration-200 group-hover:scale-110"
-        style={{ background: gradient }}
+      <div
+        className="w-[34px] h-[34px] rounded-full flex items-center justify-center transition-transform duration-200 group-hover:scale-[1.08]"
+        style={{
+          background: `${colorHex}22`,
+          color: colorHex,
+        }}
       >
-        <Icon size={24} style={{ color: categoryColor }} />
+        <Icon size={15} />
       </div>
 
-      <div className="flex flex-col items-center text-center gap-1">
-        <span className="text-[12px] font-medium text-text-primary">{label}</span>
-        {sublabel && <span className="text-[10px] text-text-muted">{sublabel}</span>}
-      </div>
+      <p className="text-[10px] font-medium text-center leading-tight"
+        style={{ color: 'var(--text-secondary)' }}>
+        {label}
+      </p>
+      {sublabel && (
+        <p className="text-[8px] text-center"
+          style={{ color: 'var(--text-disabled)' }}>
+          {sublabel}
+        </p>
+      )}
     </Link>
-  );
+  )
 }

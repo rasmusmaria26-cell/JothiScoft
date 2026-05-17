@@ -1,57 +1,60 @@
-import React from 'react';
-import { Home, Compass, Calendar, Heart, Hash, Settings } from 'lucide-react';
-import Link from 'next/link';
+'use client'
+
+import { usePathname, useRouter } from 'next/navigation'
+import { MagneticDock } from '@/components/ui/magnetic-dock'
+import {
+  LayoutDashboard,
+  Star,
+  Calendar,
+  Heart,
+  Hash,
+  Sparkles,
+  Home,
+  Settings,
+} from 'lucide-react'
+
+const NAV_ITEMS = [
+  { id: 'dashboard',  label: 'முகப்பு',       icon: <LayoutDashboard size={20} />, href: '/' },
+  { id: 'horoscope',  label: 'ஜாதகம்',        icon: <Star size={20} />,            href: '/horoscope' },
+  { id: 'panchangam', label: 'பஞ்சாங்கம்',    icon: <Calendar size={20} />,        href: '/panchangam' },
+  { id: 'matching',   label: 'பொருத்தம்',     icon: <Heart size={20} />,           href: '/matching' },
+  { id: 'numerology', label: 'எண்கணிதம்',     icon: <Hash size={20} />,            href: '/numerology' },
+  { id: 'special',    label: 'விசேஷ நாட்கள்', icon: <Sparkles size={20} />,        href: '/special' },
+  { id: 'vastu',      label: 'வாஸ்து',        icon: <Home size={20} />,            href: '/vastu' },
+  { id: 'settings',   label: 'அமைப்புகள்',    icon: <Settings size={20} />,        href: '/settings' },
+]
 
 export function Sidebar() {
+  const pathname = usePathname()
+  const router = useRouter()
+
+  const items = NAV_ITEMS.map((item) => ({
+    id: item.id,
+    label: item.label,
+    icon: item.icon,
+    isActive:
+      item.href === '/'
+        ? pathname === '/'
+        : pathname.startsWith(item.href),
+    onClick: () => router.push(item.href),
+  }))
+
   return (
-    <aside className="hidden md:flex flex-col w-64 border-r border-bg-border bg-bg-card h-[calc(100vh-4rem)] p-4 sticky top-16">
-      <nav className="flex flex-col gap-2 flex-1">
-        <Link href="/" className="flex items-center gap-3 p-3 rounded-md hover:bg-bg-active text-text-secondary hover:text-text-primary transition-colors">
-          <Home className="w-5 h-5 shrink-0" />
-          <div className="flex flex-col">
-            <span className="leading-tight">Dashboard</span>
-            <span className="text-[10px] text-text-muted">முகப்பு</span>
-          </div>
-        </Link>
-        <Link href="/horoscope" className="flex items-center gap-3 p-3 rounded-md hover:bg-bg-active text-text-secondary hover:text-text-primary transition-colors">
-          <Compass className="w-5 h-5 text-cat-horoscope shrink-0" />
-          <div className="flex flex-col">
-            <span className="leading-tight">Horoscope</span>
-            <span className="text-[10px] text-text-muted">ஜாதகம்</span>
-          </div>
-        </Link>
-        <Link href="/panchangam" className="flex items-center gap-3 p-3 rounded-md hover:bg-bg-active text-text-secondary hover:text-text-primary transition-colors">
-          <Calendar className="w-5 h-5 text-cat-panchangam shrink-0" />
-          <div className="flex flex-col">
-            <span className="leading-tight">Panchangam</span>
-            <span className="text-[10px] text-text-muted">பஞ்சாங்கம்</span>
-          </div>
-        </Link>
-        <Link href="/matching" className="flex items-center gap-3 p-3 rounded-md hover:bg-bg-active text-text-secondary hover:text-text-primary transition-colors">
-          <Heart className="w-5 h-5 text-cat-marriage shrink-0" />
-          <div className="flex flex-col">
-            <span className="leading-tight">Matching</span>
-            <span className="text-[10px] text-text-muted">பொருத்தம்</span>
-          </div>
-        </Link>
-        <Link href="/numerology" className="flex items-center gap-3 p-3 rounded-md hover:bg-bg-active text-text-secondary hover:text-text-primary transition-colors">
-          <Hash className="w-5 h-5 text-cat-numerology shrink-0" />
-          <div className="flex flex-col">
-            <span className="leading-tight">Numerology</span>
-            <span className="text-[10px] text-text-muted">எண்கணிதம்</span>
-          </div>
-        </Link>
-      </nav>
-      <div className="mt-auto pt-4 border-t border-bg-border">
-        <Link href="/settings" className="flex items-center gap-3 p-3 rounded-md hover:bg-bg-active text-text-secondary hover:text-text-primary transition-colors">
-          <Settings className="w-5 h-5 text-text-muted shrink-0" />
-          <div className="flex flex-col">
-            <span className="leading-tight">Settings</span>
-            <span className="text-[10px] text-text-muted">அமைப்புகள்</span>
-          </div>
-        </Link>
+    <aside
+      className="hidden md:flex fixed left-3 z-40"
+      style={{ top: '52px', height: 'calc(100vh - 52px)' }}
+    >
+      <div className="flex items-center h-full">
+        <MagneticDock
+          items={items}
+          position="left"
+          variant="glass"
+          iconSize={40}
+          maxScale={1.55}
+          magneticDistance={130}
+          showLabels={true}
+        />
       </div>
     </aside>
-  );
+  )
 }
-

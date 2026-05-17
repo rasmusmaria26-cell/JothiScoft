@@ -1,21 +1,22 @@
 'use client'
 
-import React from 'react';
-import { categoryData } from '@/mock/dashboard'
-import { UserInfoCard } from '@/components/dashboard/UserInfoCard'
-import { LivePanchangamBanner } from '@/components/dashboard/LivePanchangamBanner'
-import { CategorySection } from '@/components/dashboard/CategorySection'
+import { TodayHero }        from '@/components/dashboard/TodayHero'
+import { QuickAccessStrip } from '@/components/dashboard/QuickAccessStrip'
+import { ContextualRow }    from '@/components/dashboard/ContextualRow'
+import { CategorySection }  from '@/components/dashboard/CategorySection'
+import { categoryData }     from '@/mock/dashboard'
 
 export default function DashboardPage() {
   return (
-    <main className="px-4 py-4 space-y-5 pb-24">
-      <UserInfoCard />
-      <LivePanchangamBanner />
-      {categoryData.map((cat) => (
-        <CategorySection key={cat.title} {...cat} />
-      ))}
-    </main>
+    <div className="flex flex-col gap-[10px] w-full pb-24 md:pb-8">
+      <TodayHero />
+      <QuickAccessStrip />
+      <ContextualRow />
+      <div className="flex flex-col gap-[14px]">
+        {categoryData.map((cat) => (
+          <CategorySection key={cat.titleEn} {...cat} />
+        ))}
+      </div>
+    </div>
   )
 }
-
-

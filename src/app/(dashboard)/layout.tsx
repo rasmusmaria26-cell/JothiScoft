@@ -1,23 +1,35 @@
-import React from 'react';
-import { Header, Sidebar, BottomNav } from '@/components/layout';
+'use client'
+
+import { AstroBackground } from '@/components/layout/AstroBackground'
+import { Header } from '@/components/layout/Header'
+import { Sidebar } from '@/components/layout/Sidebar'
+import { BottomNav } from '@/components/layout/BottomNav'
 
 export default function DashboardLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
   return (
-    <div className="min-h-screen bg-bg-page flex flex-col">
+    <div className="min-h-screen bg-bg-page">
+      <AstroBackground />
       <Header />
-      <div className="flex flex-1 flex-col md:flex-row relative">
+      <div className="flex pt-[52px]">
         <Sidebar />
-        <main className="flex-1 pb-16 md:pb-0 px-4 py-6 md:p-8 overflow-y-auto">
-          <div className="max-w-4xl mx-auto">
-            {children}
-          </div>
+        <main className="
+          flex-1
+          min-h-[calc(100vh-52px)]
+          md:pl-[80px]
+          px-5 md:px-8
+          py-6
+          pb-24 md:pb-8
+          relative z-10
+          max-w-none
+        ">
+          {children}
         </main>
       </div>
       <BottomNav />
     </div>
-  );
+  )
 }
