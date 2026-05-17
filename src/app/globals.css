@@ -3,21 +3,44 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  /* Backgrounds */
+  --bg-page: #1a1209;
+  --bg-card: #241a0f;
+  --bg-elevated: #2e2115;
+  --bg-active: #3d2d1c;
+  --bg-border: #4a3828;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Gold Accent (Primary) */
+  --gold-deep: #c9922a;
+  --gold-mid: #e0a83a;
+  --gold-bright: #f2c96a;
+  --gold-tint: rgba(201,146,42,0.15);
+
+  /* Text */
+  --text-primary: #f5e6c8;
+  --text-secondary: #d4b896;
+  --text-muted: #8a7060;
+  --text-disabled: #5a4838;
+  --text-inverse: #1a1209;
+
+  /* Category Accents */
+  --cat-horoscope: #7b5ea7;
+  --cat-panchangam: #2e7d6b;
+  --cat-marriage: #b0415e;
+  --cat-numerology: #1e6fa8;
+  --cat-prasnam: #a05c1a;
+  --cat-special: #4a7c59;
+
+  /* Status */
+  --success: #2d7a4f;
+  --danger: #c0392b;
+  --warning: #c9922a;
+  --info: #1e6fa8;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--text-primary);
+  background: var(--bg-page);
 }
 
 @layer utilities {
