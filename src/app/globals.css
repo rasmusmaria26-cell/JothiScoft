@@ -38,9 +38,19 @@
   --info: #1e6fa8;
 }
 
-body {
-  color: var(--text-primary);
-  background: var(--bg-page);
+@layer base {
+  body {
+    color: var(--text-primary);
+    background: var(--bg-page);
+    font-family: "Anek Tamil", sans-serif;
+    font-optical-sizing: auto;
+    font-variation-settings: "wdth" 100;
+  }
+
+  h1, h2, h3, h4, h5, h6, .font-serif {
+    font-family: "Playfair Display", serif;
+    font-optical-sizing: auto;
+  }
 }
 
 @layer utilities {
@@ -48,3 +58,4 @@ body {
     text-wrap: balance;
   }
 }
+

@@ -1,16 +1,5 @@
 import type { Metadata } from "next";
-import { Anek_Tamil, Playfair_Display } from "next/font/google";
 import "./globals.css";
-
-const anekTamil = Anek_Tamil({ 
-  subsets: ["tamil", "latin"],
-  variable: "--font-anek-tamil",
-});
-
-const playfairDisplay = Playfair_Display({
-  subsets: ["latin"],
-  variable: "--font-playfair-display",
-});
 
 export const metadata: Metadata = {
   title: "JothiSoft | Professional Tamil Astrology",
@@ -23,7 +12,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ta" className={`${anekTamil.variable} ${playfairDisplay.variable}`}>
+    <html lang="ta">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Anek+Tamil:wght@100..800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet" />
+      </head>
       <body className="font-sans antialiased selection:bg-gold-deep selection:text-text-inverse">
         {children}
       </body>

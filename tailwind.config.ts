@@ -50,8 +50,8 @@ const config: Config = {
         pill: "999px",
       },
       fontFamily: {
-        sans: ["var(--font-anek-tamil)", "sans-serif"],
-        serif: ["var(--font-playfair-display)", "serif"],
+        sans: ['"Anek Tamil"', "sans-serif"],
+        serif: ['"Playfair Display"', "serif"],
       },
     },
   },
