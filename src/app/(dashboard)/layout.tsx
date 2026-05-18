@@ -2,8 +2,7 @@
 
 import { AstroBackground } from '@/components/layout/AstroBackground'
 import { Header } from '@/components/layout/Header'
-import { Sidebar } from '@/components/layout/Sidebar'
-import { BottomNav } from '@/components/layout/BottomNav'
+import { LanguageProvider } from '@/context/LanguageContext'
 
 export default function DashboardLayout({
   children,
@@ -11,25 +10,25 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="min-h-screen bg-bg-page">
-      <AstroBackground />
-      <Header />
-      <div className="flex pt-[52px]">
-        <Sidebar />
-        <main className="
-          flex-1
-          min-h-[calc(100vh-52px)]
-          md:pl-[80px]
-          px-5 md:px-8
-          py-6
-          pb-24 md:pb-8
-          relative z-10
-          max-w-none
-        ">
-          {children}
-        </main>
+    <LanguageProvider>
+      <div className="min-h-screen bg-bg-page">
+        <AstroBackground />
+        <Header />
+        <div className="flex pt-[52px]">
+          <main className="
+            flex-1
+            min-w-0
+            min-h-[calc(100vh-52px)]
+            px-3 sm:px-5 md:px-8
+            py-4 sm:py-6
+            pb-8
+            relative z-10
+            max-w-none
+          ">
+            {children}
+          </main>
+        </div>
       </div>
-      <BottomNav />
-    </div>
+    </LanguageProvider>
   )
 }

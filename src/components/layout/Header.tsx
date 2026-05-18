@@ -1,50 +1,59 @@
 'use client'
 
+import { motion } from 'framer-motion'
 import { Bell } from 'lucide-react'
 
 export function Header() {
   return (
-    <header className="
-      fixed top-0 left-0 right-0 z-50
-      h-[52px]
-      flex items-center justify-between
-      px-5 md:px-8
-      bg-[rgba(26,18,9,0.85)]
-      backdrop-blur-md
-      border-b border-bg-border
-    ">
-      <div className="flex flex-col leading-none">
-        <span className="
-          font-display text-[15px] font-bold
-          text-gold-bright tracking-wide
-        ">
+    <motion.header
+      className="fixed top-0 left-0 right-0 z-50 h-[52px] flex items-center justify-between px-5 md:px-8 backdrop-blur-md border-b"
+      style={{
+        background: 'rgba(8, 8, 24, 0.90)',
+        borderColor: 'rgba(42, 42, 74, 0.7)',
+      }}
+      initial={{ y: -52, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+    >
+      <motion.div
+        className="flex flex-col leading-none"
+        whileHover={{ scale: 1.04 }}
+        transition={{ type: 'spring', stiffness: 400 }}
+      >
+        <span className="font-display text-[15px] font-bold text-gold-bright tracking-wide">
           JothiSoft
         </span>
         <span className="text-[10px] text-text-muted tracking-wider">
           ஜோதிஷ் சாஃப்ட்வேர்
         </span>
-      </div>
+      </motion.div>
 
       <div className="flex items-center gap-3">
-        <button className="
-          w-8 h-8 rounded-full
-          flex items-center justify-center
-          text-text-muted hover:text-text-secondary
-          hover:bg-bg-active
-          transition-colors
-        ">
+        <motion.button
+          className="w-8 h-8 rounded-full flex items-center justify-center text-text-muted hover:text-text-secondary"
+          whileHover={{ scale: 1.12, rotate: 15 }}
+          whileTap={{ scale: 0.9 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 18 }}
+        >
           <Bell size={16} />
-        </button>
-        <div className="
-          w-8 h-8 rounded-full
-          bg-gradient-to-br from-gold-deep to-[#7a4e10]
-          flex items-center justify-center
-          text-[12px] font-bold text-white
-          cursor-pointer
-        ">
+        </motion.button>
+
+        <motion.div
+          className="w-8 h-8 rounded-full bg-gradient-to-br from-gold-deep to-[#7a4e10] flex items-center justify-center text-[12px] font-bold text-white cursor-pointer"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.92 }}
+          animate={{
+            boxShadow: [
+              '0 0 0px rgba(201,146,42,0)',
+              '0 0 10px rgba(201,146,42,0.5)',
+              '0 0 0px rgba(201,146,42,0)',
+            ],
+          }}
+          transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+        >
           M
-        </div>
+        </motion.div>
       </div>
-    </header>
+    </motion.header>
   )
 }
