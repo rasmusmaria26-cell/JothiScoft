@@ -207,7 +207,7 @@ export function AstroBackground() {
       ref={canvasRef}
       aria-hidden="true"
       className="fixed inset-0 w-full h-full pointer-events-none z-0"
-      style={{ opacity: 0.35 }}
+      style={{ opacity: 0.15 }}
     />
   );
 }

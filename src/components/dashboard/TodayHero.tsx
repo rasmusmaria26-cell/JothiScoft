@@ -24,8 +24,10 @@ export function TodayHero() {
     <div
       className="relative overflow-hidden rounded-[var(--radius-lg)] border"
       style={{
-        background: 'linear-gradient(135deg, rgba(201,146,42,0.12), rgba(123,94,167,0.07))',
-        borderColor: 'rgba(201,146,42,0.28)',
+        background: 'linear-gradient(135deg, rgba(201,146,42,0.15), rgba(123,94,167,0.10))',
+        backgroundColor: 'rgba(26, 18, 9, 0.70)',
+        backdropFilter: 'blur(16px)',
+        borderColor: 'rgba(201,146,42,0.35)',
         padding: '14px',
       }}
     >

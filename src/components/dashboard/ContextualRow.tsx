@@ -45,8 +45,9 @@ export function ContextualRow() {
               href={item.href}
               className="flex items-center gap-[9px] rounded-[var(--radius-md)] px-[10px] py-[9px] transition-all duration-150 hover:-translate-y-[1px]"
               style={{
-                background: 'var(--bg-card)',
-                border: '1px solid var(--bg-border)',
+                background: 'rgba(36, 26, 15, 0.75)',
+                backdropFilter: 'blur(12px)',
+                border: '1px solid rgba(74, 56, 40, 0.5)',
               }}
             >
               <div

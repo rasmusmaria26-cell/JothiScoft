@@ -34,8 +34,9 @@ export function ModuleCard({
       href={href}
       className="group relative flex flex-col items-center gap-[5px] rounded-[var(--radius-md)] py-[10px] px-[5px] transition-all duration-200 hover:-translate-y-[2px] active:scale-[0.97]"
       style={{
-        background: 'var(--bg-card)',
-        border: '1px solid var(--bg-border)',
+        background: 'rgba(36, 26, 15, 0.75)',
+        backdropFilter: 'blur(12px)',
+        border: '1px solid rgba(74, 56, 40, 0.5)',
       }}
     >
       {/* Hover glow */}
