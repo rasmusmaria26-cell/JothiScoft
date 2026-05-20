@@ -1,15 +1,19 @@
 {
-  "name": "jothisoft",
+  "name": "@jothisoft/web",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --port 3000",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
+    "@jothisoft/shared": "*",
+    "@supabase/ssr": "^0.5.0",
+    "@supabase/supabase-js": "^2.45.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.38.0",
@@ -18,6 +22,7 @@
     "react": "^18",
     "react-dom": "^18",
     "shadcn": "^4.7.0",
+    "swr": "^2.2.5",
     "tailwind-merge": "^3.6.0",
     "tw-animate-css": "^1.4.0",
     "zustand": "^5.0.13"

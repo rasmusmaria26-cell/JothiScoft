@@ -8,6 +8,9 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      screens: {
+        'xs': '400px',
+      },
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
@@ -55,8 +58,10 @@ const config: Config = {
         pill: "999px",
       },
       fontFamily: {
-        sans: ['"Anek Tamil"', "sans-serif"],
+        sans: ['"Outfit"', "sans-serif"],
         serif: ['"Playfair Display"', "serif"],
+        kavivanar: ['"Kavivanar"', "cursive"],
+        mukta: ['"Mukta Malar"', "sans-serif"],
       },
       keyframes: {
         fadeUp: {

@@ -5,7 +5,7 @@ import { Calendar, ArrowRight } from 'lucide-react';
 export function LivePanchangamBanner() {
   return (
     <Link 
-      href="/panchangam/daily"
+      href="/panchangam"
       className="flex items-center justify-between p-4 rounded-xl transition-all duration-300 hover:scale-[1.01] active:scale-[0.98] group"
       style={{
         background: 'linear-gradient(90deg, rgba(46,125,107,0.2) 0%, rgba(46,125,107,0.05) 100%)',
