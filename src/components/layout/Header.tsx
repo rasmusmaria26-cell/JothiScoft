@@ -1,9 +1,22 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Bell } from 'lucide-react'
+import { Bell, LogOut } from 'lucide-react'
+import { useAuthStore } from '@/store/authStore'
+import { supabase } from '@/lib/supabase'
 
 export function Header() {
+  const { user, clearAuth } = useAuthStore()
+  const displayInitial = user?.name 
+    ? user.name.trim().charAt(0).toUpperCase() 
+    : (user?.phone ? 'U' : 'M')
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+    clearAuth()
+    window.location.href = '/login'
+  }
+
   return (
     <motion.header
       className="fixed top-0 left-0 right-0 z-50 h-[52px] flex items-center justify-between px-5 md:px-8 backdrop-blur-md border-b"
@@ -16,16 +29,16 @@ export function Header() {
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
     >
       <motion.div
-        className="flex flex-col leading-none"
-        whileHover={{ scale: 1.04 }}
+        className="flex items-center cursor-pointer"
+        whileHover={{ scale: 1.03 }}
         transition={{ type: 'spring', stiffness: 400 }}
+        onClick={() => window.location.href = '/'}
       >
-        <span className="font-display text-[15px] font-bold text-gold-bright tracking-wide">
-          JothiSoft
-        </span>
-        <span className="text-[10px] text-text-muted tracking-wider">
-          ஜோதிஷ் சாஃப்ட்வேர்
-        </span>
+        <img
+          src="/logo.png"
+          alt="JothiSoft Logo"
+          className="h-[46px] w-auto object-contain filter drop-shadow-[0_0_10px_rgba(201,146,42,0.3)] scale-[1.6] origin-left"
+        />
       </motion.div>
 
       <div className="flex items-center gap-3">
@@ -36,6 +49,16 @@ export function Header() {
           transition={{ type: 'spring', stiffness: 400, damping: 18 }}
         >
           <Bell size={16} />
+        </motion.button>
+
+        <motion.button
+          onClick={handleLogout}
+          className="w-8 h-8 rounded-full flex items-center justify-center text-text-muted hover:text-red-400 transition-colors"
+          whileHover={{ scale: 1.12 }}
+          whileTap={{ scale: 0.9 }}
+          title="வெளியேறு · Log Out"
+        >
+          <LogOut size={16} />
         </motion.button>
 
         <motion.div
@@ -51,7 +74,7 @@ export function Header() {
           }}
           transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
         >
-          M
+          {displayInitial}
         </motion.div>
       </div>
     </motion.header>

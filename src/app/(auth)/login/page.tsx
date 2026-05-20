@@ -40,11 +40,19 @@ export default function LoginPage() {
         style={{ background: 'var(--bg-card)', borderColor: 'var(--bg-border)' }}
       >
         {/* Logo */}
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold mb-1" style={{ color: 'var(--gold-bright)', fontFamily: "'Anek Tamil', sans-serif" }}>
-            ஜோதிசாஃப்ட்
-          </h1>
-          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>JothiSoft · Tamil Astrology</p>
+        <div className="text-center mb-6 flex flex-col items-center gap-3">
+          <img
+            src="/logo.png"
+            alt="JothiSoft Logo"
+            className="w-16 h-16 object-contain filter drop-shadow-[0_0_12px_rgba(201,146,42,0.3)] animate-pulse"
+            style={{ animationDuration: '3s' }}
+          />
+          <div>
+            <h1 className="text-2xl font-bold mb-1" style={{ color: 'var(--gold-bright)', fontFamily: "'Anek Tamil', sans-serif" }}>
+              ஜோதிசாஃப்ட்
+            </h1>
+            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>JothiSoft · Tamil Astrology</p>
+          </div>
         </div>
 
         <form onSubmit={handleSendOTP} className="space-y-4">

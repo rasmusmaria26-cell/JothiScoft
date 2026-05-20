@@ -12,7 +12,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Check Supabase session from cookies
-  let response = NextResponse.next({ request })
+  const response = NextResponse.next({ request })
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -20,7 +20,7 @@ export async function middleware(request: NextRequest) {
     {
       cookies: {
         getAll: () => request.cookies.getAll(),
-        setAll: (cookies) => {
+        setAll: (cookies: Array<{ name: string; value: string; options: Record<string, unknown> }>) => {
           cookies.forEach(({ name, value, options }) => {
             response.cookies.set(name, value, options)
           })

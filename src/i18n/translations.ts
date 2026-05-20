@@ -13,6 +13,7 @@ export const translations = {
     karanam: 'கரணம்',
     rahuKalam: 'ராகு காலம்',
     fullPanchangam: 'முழு பஞ்சாங்கம்',
+    logout: 'வெளியேறு',
   },
   en: {
     greeting: 'Welcome',
@@ -26,5 +27,6 @@ export const translations = {
     karanam: 'Karanam',
     rahuKalam: 'Rahu Kalam',
     fullPanchangam: 'Full Panchangam',
+    logout: 'Log Out',
   }
 };

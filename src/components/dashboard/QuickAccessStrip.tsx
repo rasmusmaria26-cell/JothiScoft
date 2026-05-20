@@ -14,7 +14,7 @@ const TODAY_TITHI_COLOR = '#c9922a'
 
 const QUICK_LINKS = [
   { labelTa: 'விரதங்கள்',       labelEn: 'Fasts',          href: '/special',            colorHex: '#4a7c59' },
-  { labelTa: 'பஞ்சாங்கம்',      labelEn: 'Panchangam',     href: '/panchangam/daily',   colorHex: '#2e7d6b' },
+  { labelTa: 'பஞ்சாங்கம்',      labelEn: 'Panchangam',     href: '/panchangam',         colorHex: '#2e7d6b' },
   { labelTa: 'KP ஜோதிடம்',     labelEn: 'KP Astro',       href: '/horoscope/antharam', colorHex: '#7b5ea7' },
   { labelTa: 'வாஸ்து',          labelEn: 'Vastu',          href: '/vastu/days',         colorHex: '#1e6fa8' },
   { labelTa: 'பொருத்தம்',       labelEn: 'Matching',       href: '/matching/star',      colorHex: '#b0415e' },
@@ -30,7 +30,7 @@ const chipVariants = {
 
 const chipItem = {
   hidden: { opacity: 0, x: -10 },
-  show: { opacity: 1, x: 0, transition: { type: 'spring', stiffness: 300 } },
+  show: { opacity: 1, x: 0, transition: { type: 'spring' as const, stiffness: 300 } },
 }
 
 export function QuickAccessStrip() {

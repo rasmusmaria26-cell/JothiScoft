@@ -15,7 +15,7 @@ interface Module {
   href: string
 }
 
-interface CategorySectionProps {
+export interface CategorySectionProps {
   titleTa: string
   titleEn: string
   colorHex: string
@@ -31,7 +31,7 @@ const cardContainer = {
 
 const cardItem = {
   hidden: { opacity: 0, y: 14, scale: 0.95 },
-  show:   { opacity: 1, y: 0, scale: 1, transition: { type: 'spring', stiffness: 280, damping: 22 } },
+  show:   { opacity: 1, y: 0, scale: 1, transition: { type: 'spring' as const, stiffness: 280, damping: 22 } },
 }
 
 export function CategorySection({

@@ -8,7 +8,9 @@ import {
   CircleDot, Flame, Sun, Gift, BookMarked,
 } from 'lucide-react'
 
-export const categoryData = [
+import { CategorySectionProps } from '../components/dashboard/CategorySection'
+
+export const categoryData: CategorySectionProps[] = [
   {
     titleTa: 'ஜாதகம் & பலன்கள்',
     titleEn: 'Horoscope',
@@ -31,7 +33,7 @@ export const categoryData = [
     modules: [
       { icon: Clock,       labelTa: 'கல் முகூர்த்தம்',  labelEn: 'Muhurtham',      sublabelTa: 'Auspicious', sublabelEn: 'Auspicious', href: '/panchangam/muhurtham' },
       { icon: CalendarDays,labelTa: 'மாத பஞ்சாங்கம்',   labelEn: 'Monthly Panch',  sublabelTa: 'Monthly',    sublabelEn: 'Monthly',    href: '/panchangam/monthly',   badge: 'PRO' },
-      { icon: Calendar,    labelTa: 'நாள் பஞ்சாங்கம்',  labelEn: 'Daily Panch',    sublabelTa: 'Daily',      sublabelEn: 'Daily',      href: '/panchangam/daily',     badge: 'NEW' },
+      { icon: Calendar,    labelTa: 'நாள் பஞ்சாங்கம்',  labelEn: 'Daily Panch',    sublabelTa: 'Daily',      sublabelEn: 'Daily',      href: '/panchangam',     badge: 'NEW' },
       { icon: Info,        labelTa: 'பஞ்சாங்கம் தகவல்', labelEn: 'Panch Info',     sublabelTa: 'Info',       sublabelEn: 'Info',       href: '/panchangam/info',      badge: 'NEW' },
     ],
   },
@@ -51,9 +53,9 @@ export const categoryData = [
     titleEn: 'Numerology & Vastu',
     colorHex: '#1e6fa8',
     modules: [
-      { icon: Hash,    labelTa: 'பெயர் எண்',     labelEn: 'Name Number',   sublabelTa: 'Name Num.',    sublabelEn: 'Name Num.',    href: '/numerology/name' },
-      { icon: Calendar,labelTa: 'தேதி எண்',       labelEn: 'Date Number',   sublabelTa: 'Date Num.',    sublabelEn: 'Date Num.',    href: '/numerology/date' },
-      { icon: Timer,   labelTa: 'வயது கணக்கிடு',  labelEn: 'Age Calc',      sublabelTa: 'Age Calc.',    sublabelEn: 'Age Calc.',    href: '/numerology/age',  badge: 'FREE' },
+      { icon: Hash,    labelTa: 'பெயர் எண்',     labelEn: 'Name Number',   sublabelTa: 'Name Num.',    sublabelEn: 'Name Num.',    href: '/numerology' },
+      { icon: Calendar,labelTa: 'தேதி எண்',       labelEn: 'Date Number',   sublabelTa: 'Date Num.',    sublabelEn: 'Date Num.',    href: '/numerology' },
+      { icon: Timer,   labelTa: 'வயது கணக்கிடு',  labelEn: 'Age Calc',      sublabelTa: 'Age Calc.',    sublabelEn: 'Age Calc.',    href: '/numerology',  badge: 'FREE' },
       { icon: Home,    labelTa: 'வாஸ்து நாட்கள்', labelEn: 'Vastu Days',    sublabelTa: 'Vastu Days',   sublabelEn: 'Vastu Days',   href: '/vastu/days' },
       { icon: Ruler,   labelTa: 'மனையடி',         labelEn: 'Dimensions',    sublabelTa: 'Dimensions',   sublabelEn: 'Dimensions',   href: '/vastu/house' },
     ],

@@ -81,13 +81,21 @@ export default function OTPPage() {
         className="w-full max-w-sm mx-4 rounded-[var(--radius-lg)] p-8 border"
         style={{ background: 'var(--bg-card)', borderColor: 'var(--bg-border)' }}
       >
-        <div className="text-center mb-8">
-          <h2 className="text-xl font-bold mb-1" style={{ color: 'var(--text-primary)' }}>
-            OTP சரிபார்ப்பு
-          </h2>
-          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-            {phone} க்கு அனுப்பப்பட்டது
-          </p>
+        <div className="text-center mb-6 flex flex-col items-center gap-3">
+          <img
+            src="/logo.png"
+            alt="JothiSoft Logo"
+            className="w-12 h-12 object-contain filter drop-shadow-[0_0_8px_rgba(201,146,42,0.25)] animate-pulse"
+            style={{ animationDuration: '3s' }}
+          />
+          <div>
+            <h2 className="text-xl font-bold mb-1" style={{ color: 'var(--text-primary)' }}>
+              OTP சரிபார்ப்பு
+            </h2>
+            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+              {phone} க்கு அனுப்பப்பட்டது
+            </p>
+          </div>
         </div>
 
         <form onSubmit={handleVerify} className="space-y-6">

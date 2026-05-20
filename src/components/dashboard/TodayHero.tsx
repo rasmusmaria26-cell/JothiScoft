@@ -1,42 +1,142 @@
-'use client'
-
+import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Phone } from 'lucide-react'
+import useSWR from 'swr'
 import { useLanguage } from '@/context/LanguageContext'
 import { translations } from '@/i18n/translations'
+import { useBirthProfile } from '@/hooks/useBirthProfile'
 
-const MOCK_USER = {
-  name: 'Maya',
-  phone: '9345851195',
-  plan: '3 Months Plan',
-  expiry: '27 Jun 26',
-}
+const WEEKDAY_DETAILS: Record<number, { color: string; colorTa: string; colorEn: string; number: string; directionTa: string; directionEn: string }> = {
+  0: { color: '#e2e8f0', colorTa: 'வெள்ளி/வெள்ளை', colorEn: 'Silver/White', number: '2', directionTa: 'வடக்கு', directionEn: 'North' },
+  1: { color: '#ef4444', colorTa: 'சிகப்பு', colorEn: 'Red', number: '9', directionTa: 'தெற்கு', directionEn: 'South' },
+  2: { color: '#22c55e', colorTa: 'பச்சை', colorEn: 'Green', number: '5', directionTa: 'வடகிழக்கு', directionEn: 'North-East' },
+  3: { color: '#eab308', colorTa: 'மஞ்சள்', colorEn: 'Yellow', number: '3', directionTa: 'வடக்கு', directionEn: 'North' },
+  4: { color: '#fae8ff', colorTa: 'வெள்ளை/கிரீம்', colorEn: 'White/Cream', number: '6', directionTa: 'கிழக்கு', directionEn: 'East' },
+  5: { color: '#3b82f6', colorTa: 'நீலம்/கருப்பு', colorEn: 'Blue/Black', number: '8', directionTa: 'மேற்கு', directionEn: 'West' },
+  6: { color: '#f97316', colorTa: 'தங்கம்/சிவப்பு', colorEn: 'Orange/Red', number: '1', directionTa: 'கிழக்கு', directionEn: 'East' }
+};
 
-const MOCK_PANCHANGAM = {
-  tithi: 'சஷ்டி',
-  tithiEn: 'Sashti',
-  nakshatra: 'கார்த்திகை',
-  nakshatraEn: 'Karthigai',
-  yogam: 'சுபம்',
-  yogamEn: 'Subham',
-  karanam: 'பவம்',
-  karanamEn: 'Bavam',
-  rahuKalam: '10:30 – 12:00',
-  dateTa: 'ஞாயிறு · 17 மே 2026',
-  dateEn: 'Sun · 17 May 2026',
-  luckyColor: '#22c55e',
-  luckyColorNameTa: 'பச்சை',
-  luckyColorNameEn: 'Green',
-  luckyNumber: '6',
-  luckyDirectionTa: 'கிழக்கு',
-  luckyDirectionEn: 'East',
-  isAuspicious: true,
-}
+const TAMIL_MAPS = {
+  tithi: {
+    "Pratipada": "பிரதமை", "Dvitiya": "துவிதியை", "Tritiya": "திருதியை", "Chaturthi": "சதுர்த்தி", "Panchami": "பஞ்சமி",
+    "Shashthi": "சஷ்டி", "Saptami": "சப்தமி", "Ashtami": "அஷ்டமி", "Navami": "நவமி", "Dashami": "தசமி",
+    "Ekadashi": "ஏகாதசி", "Dwadashi": "துவாதசி", "Trayodashi": "திரயோதசி", "Chaturdashi": "சதுர்தசி",
+    "Purnima": "பௌர்ணமி", "Amavasya": "அமாவாசை"
+  } as Record<string, string>,
+  nakshatra: {
+    "Ashwini": "அஸ்வினி", "Bharani": "பரணி", "Krittika": "கார்த்திகை", "Rohini": "ரோகிணி", "Mrigashira": "மிருகசீரிடம்",
+    "Ardra": "திருவாதிரை", "Punarvasu": "புனர்பூசம்", "Pushya": "பூசம்", "Ashlesha": "ஆயில்யம்", "Magha": "மகம்",
+    "Purva Phalguni": "பூரம்", "Uttara Phalguni": "உத்திரம்", "Hasta": "அஸ்தம்", "Chitra": "சித்திரை", "Swati": "சுவாதி",
+    "Vishakha": "விசாகம்", "Anuradha": "அனுஷம்", "Jyeshtha": "கேட்டை", "Mula": "மூலம்", "Purva Ashadha": "பூராடம்",
+    "Uttara Ashadha": "உத்திராடம்", "Shravana": "திருவோணம்", "Dhanishta": "அவிட்டம்", "Shatabhisha": "சதயம்",
+    "Purva Bhadrapada": "பூரட்டாதி", "Uttara Bhadrapada": "உத்திரட்டாதி", "Revati": "ரேவதி"
+  } as Record<string, string>,
+  yogam: {
+    "Vishkambha": "விஷ்கம்பம்", "Preeti": "பிரீதி", "Ayushman": "ஆயுஷ்மான்", "Saubhagya": "சௌபாக்கியம்", "Shobhana": "சோபனம்",
+    "Atiganda": "அதிகண்டம்", "Sukarma": "சுகர்மம்", "Dhriti": "திருதி", "Shoola": "சூலம்", "Ganda": "கண்டம்",
+    "Vriddhi": "விருத்தி", "Dhruva": "துருவம்", "Vyaghata": "வியாகாதம்", "Harshana": "ஹர்ஷணம்", "Vajra": "வஜிரம்",
+    "Siddhi": "சித்தி", "Vyatipata": "வியாதிபாதம்", "Variyana": "வரியான்", "Parigha": "பரிகம்", "Shiva": "சிவம்",
+    "Siddha": "சித்தம்", "Sadhya": "சாத்தியம்", "Shubha": "சுபம்", "Shukla": "சுக்கிலம்", "Brahma": "பிரம்மம்",
+    "Indra": "ஐந்திரம்", "Vaidhriti": "வைதிருதி"
+  } as Record<string, string>,
+  karanam: {
+    "Bava": "பவம்", "Balava": "பாலவம்", "Kaulava": "கௌலவம்", "Taitila": "தைதிலை", "Garaja": "கரசை",
+    "Vanija": "வணிசை", "Vishti": "விஷ்டி", "Shakuni": "சகுனி", "Chatushpada": "சதுஷ்பாதம்", "Naga": "நாகவம்",
+    "Kimstughna": "கிம்ஸ்துக்கினம்"
+  } as Record<string, string>,
+  paksha: {
+    "Shukla": "வளர்பிறை · Shukla",
+    "Krishna": "தேய்பிறை · Krishna"
+  } as Record<string, string>
+};
 
 export function TodayHero() {
   const { language } = useLanguage()
   const t = translations[language]
   
+  const { data: birthProfile, isLoading: isProfileLoading } = useBirthProfile()
+  
+  const [coords, setCoords] = useState({ lat: 13.0827, lng: 80.2707 })
+  const [profileName, setProfileName] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (isProfileLoading) return
+
+    if (birthProfile) {
+      setCoords({ lat: Number(birthProfile.lat), lng: Number(birthProfile.lng) })
+      setProfileName(birthProfile.place_name)
+    } else {
+      // Fallback to browser location
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude })
+          setProfileName(language === 'ta' ? 'உள்ளூர்' : 'Local')
+        },
+        () => {
+          setCoords({ lat: 13.0827, lng: 80.2707 })
+          setProfileName(language === 'ta' ? 'சென்னை' : 'Chennai')
+        }
+      )
+    }
+  }, [birthProfile, isProfileLoading, language])
+
+  const today = new Date()
+  const dateStr = today.toISOString().split('T')[0]
+  
+  const { data, isLoading } = useSWR(
+    `/api/calc/panchangam?date=${dateStr}&lat=${coords.lat}&lng=${coords.lng}`,
+    async (url) => {
+      const baseUrl = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000'
+      const res = await fetch(`${baseUrl}${url}`)
+      if (!res.ok) throw new Error('API failed')
+      return res.json()
+    }
+  )
+
+  const weekday = today.getDay() // Sun=0, Sat=6
+  const normalizedDay = weekday === 0 ? 6 : weekday - 1 // Mon=0, Sun=6
+  const lucky = WEEKDAY_DETAILS[normalizedDay] || WEEKDAY_DETAILS[0]
+
+  const dateTaStr = today.toLocaleDateString('ta-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+  const dateEnStr = today.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
+
+  if (isLoading || !data) {
+    return (
+      <div
+        className="relative overflow-hidden rounded-[var(--radius-lg)] border p-4 animate-pulse flex flex-col gap-4"
+        style={{
+          backgroundColor: 'rgba(15, 15, 36, 0.80)',
+          borderColor: 'rgba(123,94,167,0.40)',
+        }}
+      >
+        <div className="h-6 w-1/3 bg-white/10 rounded" />
+        <div className="h-14 w-full bg-white/10 rounded-[10px]" />
+        <div className="grid grid-cols-3 gap-2">
+          <div className="h-12 bg-white/10 rounded" />
+          <div className="h-12 bg-white/10 rounded" />
+          <div className="h-12 bg-white/10 rounded" />
+        </div>
+        <div className="h-8 w-full bg-white/10 rounded" />
+      </div>
+    )
+  }
+
+  // Translate variables
+  const pakshaName = TAMIL_MAPS.paksha[data.paksha] || data.paksha
+  const tithiRaw = data.tithi?.name || ''
+  const tithiName = language === 'ta' ? (TAMIL_MAPS.tithi[tithiRaw] || tithiRaw) : tithiRaw
+  
+  const starRaw = data.nakshatra?.name || ''
+  const starName = language === 'ta' ? (TAMIL_MAPS.nakshatra[starRaw] || starRaw) : starRaw
+  const pada = data.nakshatra?.pada || 1
+
+  const yogamRaw = data.yogam?.name || ''
+  const yogamName = language === 'ta' ? (TAMIL_MAPS.yogam[yogamRaw] || yogamRaw) : yogamRaw
+
+  const karanamRaw = data.karanam?.name || ''
+  const karanamName = language === 'ta' ? (TAMIL_MAPS.karanam[karanamRaw] || karanamRaw) : karanamRaw
+
+  const isAuspicious = true // default high quality astrological signifier
+
   return (
     <motion.div
       className="relative overflow-hidden rounded-[var(--radius-lg)] border p-3 sm:p-4"
@@ -65,22 +165,18 @@ export function TodayHero() {
         }}
       />
 
-      {/* Top row — greeting + badges */}
-      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-0 mb-4 relative z-10 hidden">
-        {/* We can hide this if UserInfoCard covers it, but we keep the updated code for reference */}
+      {/* Date & Location Header */}
+      <div className="flex justify-between items-start mb-3 relative z-10">
         <div>
-          <p className="text-[12px] mb-[3px]" style={{ color: 'var(--text-muted)' }}>
-            {language === 'ta' ? MOCK_PANCHANGAM.dateTa : MOCK_PANCHANGAM.dateEn}
+          <span className="text-[11px] font-semibold tracking-wider" style={{ color: 'var(--text-muted)' }}>
+            {language === 'ta' ? dateTaStr : dateEnStr}
+          </span>
+          <p className="text-[10px] text-gold-bright mt-0.5 font-medium">
+            📍 {profileName} ({coords.lat.toFixed(2)}°, {coords.lng.toFixed(2)}°)
           </p>
-          <motion.h1
-            className="text-[20px] sm:text-[24px] font-bold leading-tight"
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.15, type: 'spring', stiffness: 300 }}
-            style={{ color: 'var(--text-primary)' }}
-          >
-            {t.greeting}, {MOCK_USER.name} 🙏
-          </motion.h1>
+        </div>
+        <div className="text-[10px] bg-white/5 border border-white/10 px-2 py-0.5 rounded text-text-muted">
+          {pakshaName}
         </div>
       </div>
 
@@ -100,10 +196,10 @@ export function TodayHero() {
           <div>
             <p className="text-[10px] mb-[2px]" style={{ color: 'var(--text-muted)' }}>{t.tithi}</p>
             <p className="text-[18px] font-bold" style={{ color: 'var(--gold-bright)' }}>
-              {language === 'ta' ? MOCK_PANCHANGAM.tithi : MOCK_PANCHANGAM.tithiEn}
+              {tithiName}
             </p>
           </div>
-          {MOCK_PANCHANGAM.isAuspicious && (
+          {isAuspicious && (
             <div
               className="flex items-center gap-[5px] px-[8px] py-[3px] rounded-full text-[10px] font-medium"
               style={{
@@ -119,11 +215,11 @@ export function TodayHero() {
         </motion.div>
 
         {/* Secondary 3-col grid — staggered */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-[5px]">
+        <div className="grid grid-cols-3 gap-[5px]">
           {[
-            { key: t.nakshatra, val: language === 'ta' ? MOCK_PANCHANGAM.nakshatra : MOCK_PANCHANGAM.nakshatraEn },
-            { key: t.yogam,      val: language === 'ta' ? MOCK_PANCHANGAM.yogam : MOCK_PANCHANGAM.yogamEn },
-            { key: t.karanam,    val: language === 'ta' ? MOCK_PANCHANGAM.karanam : MOCK_PANCHANGAM.karanamEn },
+            { key: t.nakshatra, val: `${starName} (${pada})` },
+            { key: t.yogam,      val: yogamName },
+            { key: t.karanam,    val: karanamName },
           ].map(({ key, val }, index) => (
             <motion.div
               key={key}
@@ -136,8 +232,8 @@ export function TodayHero() {
                 border: '1px solid rgba(255,255,255,0.05)',
               }}
             >
-              <p className="text-[10px] sm:text-[11px] mb-[2px]" style={{ color: 'var(--text-muted)' }}>{key}</p>
-              <p className="text-[13px] sm:text-[14px] font-semibold" style={{ color: 'var(--text-primary)' }}>{val}</p>
+              <p className="text-[9px] sm:text-[10px] mb-[2px]" style={{ color: 'var(--text-muted)' }}>{key}</p>
+              <p className="text-[12px] sm:text-[13px] font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{val}</p>
             </motion.div>
           ))}
         </div>
@@ -162,16 +258,16 @@ export function TodayHero() {
           <div
             className="flex items-center gap-[5px] px-[8px] py-[3px] rounded-full text-[10px]"
             style={{
-              background: `${MOCK_PANCHANGAM.luckyColor}18`,
-              border: `1px solid ${MOCK_PANCHANGAM.luckyColor}40`,
-              color: MOCK_PANCHANGAM.luckyColor,
+              background: `${lucky.color}18`,
+              border: `1px solid ${lucky.color}40`,
+              color: lucky.color === '#e2e8f0' ? 'var(--text-primary)' : lucky.color,
             }}
           >
             <span
               className="w-[8px] h-[8px] rounded-full flex-shrink-0"
-              style={{ background: MOCK_PANCHANGAM.luckyColor }}
+              style={{ background: lucky.color }}
             />
-            {language === 'ta' ? MOCK_PANCHANGAM.luckyColorNameTa : MOCK_PANCHANGAM.luckyColorNameEn}
+            {language === 'ta' ? lucky.colorTa : lucky.colorEn}
           </div>
           {/* Lucky number */}
           <div
@@ -182,7 +278,7 @@ export function TodayHero() {
               color: 'var(--gold-bright)',
             }}
           >
-            #{MOCK_PANCHANGAM.luckyNumber}
+            #{lucky.number}
           </div>
           {/* Lucky direction */}
           <div
@@ -193,7 +289,7 @@ export function TodayHero() {
               color: '#60b4f0',
             }}
           >
-            {language === 'ta' ? MOCK_PANCHANGAM.luckyDirectionTa : MOCK_PANCHANGAM.luckyDirectionEn}
+            {language === 'ta' ? lucky.directionTa : lucky.directionEn}
           </div>
         </div>
       </motion.div>
@@ -209,12 +305,8 @@ export function TodayHero() {
           }}
         >
           <span className="w-[4px] h-[4px] rounded-full flex-shrink-0" style={{ background: '#e05050' }} />
-          {t.rahuKalam}: {MOCK_PANCHANGAM.rahuKalam}
+          {t.rahuKalam}: {data.rahu_kalam?.start} – {data.rahu_kalam?.end}
         </div>
-        <button className="text-[11px] sm:text-[12px] flex items-center gap-[3px] py-2 px-3 -mr-3 -my-2 transition-colors hover:text-gold-bright" style={{ color: 'var(--text-muted)' }}>
-          {t.fullPanchangam}
-          <span style={{ color: 'var(--gold-deep)' }}>→</span>
-        </button>
       </div>
     </motion.div>
   )
