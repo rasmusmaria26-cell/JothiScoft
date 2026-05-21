@@ -8,6 +8,9 @@ import { useLanguage } from '@/context/LanguageContext'
 import { useAuthStore } from '@/store/authStore'
 import { PlaceSearch } from '@/components/astro/PlaceSearch'
 import { CityData } from '@/types/astro'
+import ErrorBoundary from '@/components/common/ErrorBoundary'
+import { PanchangamSkeleton } from '@/components/astro/SkeletonCards'
+import api from '@/lib/api'
 
 // Interfaces for Panchangam response
 interface PanchangamResponse {
@@ -179,14 +182,20 @@ export default function PanchangamPage() {
       setIsLoading(true)
       setError(null)
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000'
-        const url = `${baseUrl}/api/calc/panchangam?date=${selectedDate}&lat=${selectedCity.latitude}&lng=${selectedCity.longitude}`
-        const res = await fetch(url)
-        if (!res.ok) throw new Error('Panchangam API failed')
-        const data = await res.json()
+        const json = await api.post('/panchangam/daily', {
+          date: selectedDate,
+          lat: selectedCity.latitude,
+          lng: selectedCity.longitude,
+          utcOffset: selectedCity.utc_offset || 5.5,
+          language: language || 'ta'
+        })
+
+        if (!json.success || !json.data) {
+          throw new Error('Panchangam API failed')
+        }
 
         if (active) {
-          setPanchangam(data)
+          setPanchangam(json.data)
         }
       } catch (err) {
         console.error(err)
@@ -205,7 +214,7 @@ export default function PanchangamPage() {
     return () => {
       active = false
     }
-  }, [selectedDate, selectedCity, labels.errorFetch])
+  }, [selectedDate, selectedCity, language, labels.errorFetch])
 
   // Helper date manipulators
   const changeDate = (days: number) => {
@@ -219,7 +228,8 @@ export default function PanchangamPage() {
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto py-4 px-4 sm:px-6">
+    <ErrorBoundary label="Daily Panchangam failed to load.">
+      <div className="w-full max-w-7xl mx-auto py-4 px-4 sm:px-6">
       {/* Page Header */}
       <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -290,10 +300,7 @@ export default function PanchangamPage() {
       {/* Main Results Dashboard */}
       <AnimatePresence mode="wait">
         {isLoading && !panchangam ? (
-          <div className="py-20 text-center text-xs text-text-muted flex flex-col items-center justify-center gap-3">
-            <RefreshCw className="h-8 w-8 animate-spin text-gold-mid" style={{ color: 'var(--cat-panchangam)' }} />
-            {labels.calculating}
-          </div>
+          <PanchangamSkeleton />
         ) : error ? (
           <div className="p-4 text-sm text-red-400 bg-red-500/5 border border-red-500/10 rounded-xl flex items-center gap-3 justify-center">
             <AlertCircle className="h-5 w-5 shrink-0" />
@@ -479,6 +486,7 @@ export default function PanchangamPage() {
           </motion.div>
         ) : null}
       </AnimatePresence>
-    </div>
+      </div>
+    </ErrorBoundary>
   )
 }

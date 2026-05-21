@@ -8,6 +8,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { PlaceSearch } from '@/components/astro/PlaceSearch'
 import { BookChartReport } from '@/components/astro/BookChartReport'
 import { CityData, HoroscopeResponse, DashaResponse } from '@/types/astro'
+import api from '@/lib/api'
 
 export default function BookChartPage() {
   const { language } = useLanguage()
@@ -65,32 +66,49 @@ export default function BookChartPage() {
     setError(null)
 
     try {
-      const [year, month, day] = dob.split('-').map(Number)
-      const [hour, minute] = tob.split(':').map(Number)
       const lat = selectedCity.latitude ?? selectedCity.lat ?? 13.08
       const lng = selectedCity.longitude ?? selectedCity.lng ?? 80.27
       const tz = selectedCity.utc_offset ?? 5.5
 
-      const baseUrl = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000'
+      // 1. Fetch horoscope via Express proxy
+      const horoRes = await api.post('/horoscope/calculate', {
+        date: dob,
+        time: tob,
+        lat,
+        lng,
+        utcOffset: tz,
+        language: reportLanguage
+      })
 
-      // Fetch horoscope and dasa in parallel
-      const [horoRes, dasaRes] = await Promise.all([
-        fetch(`${baseUrl}/api/calc/horoscope`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ year, month, day, hour, minute, lat, lng, tz_offset: tz })
-        }),
-        fetch(`${baseUrl}/api/calc/dasha`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ year, month, day, hour, minute, lat, lng, tz_offset: tz })
-        })
-      ])
+      if (!horoRes.success || !horoRes.data) throw new Error('Horoscope API Error')
+      const horoData = horoRes.data
 
-      if (!horoRes.ok) throw new Error('Horoscope API Error')
+      // 2. Calculate Moon Longitude and fetch Dasha
+      const moonPlanet = horoData.planets.find((p: any) => p.planet.toLowerCase() === 'moon')
+      let dasaData: DashaResponse | null = null
 
-      const horoData = await horoRes.json()
-      const dasaData = dasaRes.ok ? await dasaRes.json() : null
+      if (moonPlanet) {
+        const moonSignIndex = [
+          'Mesha', 'Vrishabha', 'Mithuna', 'Kataka',
+          'Simha', 'Kanya', 'Thula', 'Vrischika',
+          'Dhanus', 'Makara', 'Kumbha', 'Meena'
+        ].indexOf(moonPlanet.sign)
+        
+        if (moonSignIndex !== -1) {
+          const moonLongitude = (moonSignIndex * 30) + moonPlanet.sign_degree
+          
+          try {
+            const dasaRes = await api.post('/horoscope/dasha', {
+              birth_date: dob,
+              moon_longitude: moonLongitude
+            })
+            // Depending on the backend response structure for dasha
+            dasaData = dasaRes.success ? dasaRes.data : dasaRes
+          } catch (e) {
+            console.error('Dasha fetch failed', e)
+          }
+        }
+      }
 
       setHoroscope(horoData)
       setDasa(dasaData)

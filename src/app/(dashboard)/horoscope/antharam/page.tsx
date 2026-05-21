@@ -10,6 +10,7 @@ import { supabase } from '@/lib/supabase'
 import { DashaResponse } from '@/types/astro'
 import { NoBirthProfile } from '@/components/astro/NoBirthProfile'
 import { DashaTimelineExplorer } from '@/components/astro/DashaTimelineExplorer'
+import api from '@/lib/api'
 
 export default function AntharamExplorerPage() {
   const { user } = useAuthStore()
@@ -70,38 +71,54 @@ export default function AntharamExplorerPage() {
         setLoadingProfile(false)
         setCalculatingDasha(true)
 
-        // 2. Parse date & time components
-        const [year, month, day] = profile.dob.split('-').map(Number)
-        const [hour, minute] = profile.tob.split(':').map(Number)
-        const lat = Number(profile.lat)
-        const lng = Number(profile.lng)
-        const tz = 5.5 // Standard IST
-
-        // 3. Make single high-precision API call
-        const baseUrl = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000'
-        const response = await fetch(`${baseUrl}/api/calc/dasha`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            year,
-            month,
-            day,
-            hour,
-            minute,
-            lat,
-            lng,
-            tz_offset: tz
-          })
-        })
-
-        if (!response.ok) {
-          throw new Error('API request failed')
+// ... in loadProfileAndCalculate
+        const payload = {
+          date: profile.dob,
+          time: profile.tob,
+          lat: Number(profile.lat),
+          lng: Number(profile.lng),
+          utcOffset: 5.5,
+          language: language || 'ta'
         }
 
-        const data: DashaResponse = await response.json()
-        setDasaData(data)
+        const horoRes = await api.post('/horoscope/calculate', payload)
+        
+        if (!horoRes.success || !horoRes.data) {
+          throw new Error('Horoscope calculation failed')
+        }
+
+        const horoData = horoRes.data
+        const moonPlanet = horoData.planets.find((p: any) => p.planet.toLowerCase() === 'moon' || p.planet === 'சந்திரன்')
+        let finalDasaData = null
+
+        if (moonPlanet) {
+          const moonSignIndex = [
+            'Mesha', 'Vrishabha', 'Mithuna', 'Kataka',
+            'Simha', 'Kanya', 'Thula', 'Vrischika',
+            'Dhanus', 'Makara', 'Kumbha', 'Meena'
+          ].indexOf(moonPlanet.sign)
+          
+          if (moonSignIndex !== -1) {
+            const moonLongitude = (moonSignIndex * 30) + moonPlanet.sign_degree
+            
+            const dasaRes = await api.post('/horoscope/dasha', {
+              birth_date: profile.dob,
+              moon_longitude: moonLongitude
+            })
+            
+            if (dasaRes.success) {
+              finalDasaData = dasaRes.data
+            } else if (dasaRes && dasaRes.major_dashas) {
+              finalDasaData = dasaRes
+            }
+          }
+        }
+
+        if (!finalDasaData) {
+          throw new Error('Dasha calculation failed')
+        }
+
+        setDasaData(finalDasaData)
 
       } catch (err) {
         console.error(err)

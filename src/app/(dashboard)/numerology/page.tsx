@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Calculator, ArrowLeft, RefreshCw, Hash, Calendar, Clock, ChevronDown, ChevronUp, Info, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
+import api from '@/lib/api'
+import ErrorBoundary from '@/components/common/ErrorBoundary'
 
 interface NumerologyResponse {
   name: string
@@ -96,17 +98,9 @@ export default function NumerologyPage() {
     setError(null)
 
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000'
-      const response = await fetch(`${baseUrl}/api/calc/numerology`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, dob })
-      })
-
-      if (!response.ok) throw new Error('API failed')
-      
-      const data: NumerologyResponse = await response.json()
-      setResult(data)
+      const response = await api.post('/numerology/calculate', { name, dob })
+      if (!response) throw new Error('API failed')
+      setResult(response as any)
     } catch (err) {
       console.error(err)
       setError(labels.errorMessage)
@@ -154,7 +148,8 @@ export default function NumerologyPage() {
   const ageDetails = dob ? calculateAgeDetails(dob) : null
 
   return (
-    <div className="max-w-[1000px] mx-auto flex flex-col gap-6">
+    <ErrorBoundary label="Numerology calculator failed to load.">
+      <div className="max-w-[1000px] mx-auto flex flex-col gap-6">
       {/* Header back link */}
       <div className="flex items-center justify-between">
         <Link 
@@ -399,6 +394,7 @@ export default function NumerologyPage() {
         )}
       </AnimatePresence>
 
-    </div>
+      </div>
+    </ErrorBoundary>
   )
 }

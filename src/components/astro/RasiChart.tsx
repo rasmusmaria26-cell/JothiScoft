@@ -98,7 +98,7 @@ export function RasiChart({ chart, planets, title, lagnaSign, isPrint = false, l
 
       {/* Grid Container */}
       <div 
-        className={`grid grid-cols-4 grid-rows-4 w-full aspect-square border rounded-lg overflow-hidden relative ${isPrint ? 'bg-transparent border-gray-400' : ''}`}
+        className={`grid grid-cols-4 grid-rows-4 w-full aspect-square border rounded-lg relative ${isPrint ? 'bg-transparent border-gray-400' : ''}`}
         style={!isPrint ? {
           background: 'rgba(8, 8, 24, 0.65)',
           borderColor: 'rgba(42, 42, 74, 0.7)',
@@ -128,11 +128,18 @@ export function RasiChart({ chart, planets, title, lagnaSign, isPrint = false, l
           const signPlanets = getPlanetsInSign(cell.sign)
           const signName = language === 'ta' ? SIGN_MAP_TA[cell.sign] : cell.sign
 
+          const isTopLeft = cell.sign === 'Meena'
+          const isTopRight = cell.sign === 'Mithuna'
+          const isBottomLeft = cell.sign === 'Dhanus'
+          const isBottomRight = cell.sign === 'Kanya'
+
           return (
             <motion.div
               key={cell.sign}
               className={`
                 ${cell.gridClass} p-1 flex flex-col relative group cursor-default select-none
+                ${isTopLeft ? 'rounded-tl-lg' : ''} ${isTopRight ? 'rounded-tr-lg' : ''}
+                ${isBottomLeft ? 'rounded-bl-lg' : ''} ${isBottomRight ? 'rounded-br-lg' : ''}
                 ${isPrint ? 'border border-gray-400 bg-transparent' : 'border border-bg-border/60 transition-colors duration-150 hover:bg-gold-deep/5'}
               `}
               style={!isPrint ? {

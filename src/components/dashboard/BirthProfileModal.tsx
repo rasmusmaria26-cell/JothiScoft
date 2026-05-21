@@ -82,8 +82,8 @@ export function BirthProfileModal({ isOpen, onClose, onSuccess }: BirthProfileMo
     const delayDebounce = setTimeout(async () => {
       setIsSearching(true)
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000'
-        const response = await fetch(`${baseUrl}/api/cities?q=${encodeURIComponent(cityInput)}&limit=6`)
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'
+        const response = await fetch(`${apiUrl}/cities?q=${encodeURIComponent(cityInput)}&limit=6`)
         if (response.ok) {
           const data = await response.json()
           setSuggestions(data)

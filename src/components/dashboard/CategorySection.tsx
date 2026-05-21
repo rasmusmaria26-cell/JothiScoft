@@ -42,6 +42,24 @@ export function CategorySection({
 }: CategorySectionProps) {
   const { language } = useLanguage()
 
+  // Dynamically select the optimal grid column layout to guarantee flawless symmetry and perfect balance!
+  const getGridColsClass = (count: number) => {
+    switch (count) {
+      case 3:
+        return 'grid-cols-2 xs:grid-cols-3 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3'
+      case 4:
+        return 'grid-cols-2 xs:grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-4'
+      case 5:
+        return 'grid-cols-2 xs:grid-cols-3 sm:grid-cols-5 md:grid-cols-5 lg:grid-cols-5 xl:grid-cols-5'
+      case 8:
+        return 'grid-cols-2 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-4'
+      case 10:
+        return 'grid-cols-2 xs:grid-cols-3 sm:grid-cols-5 md:grid-cols-5 lg:grid-cols-5 xl:grid-cols-5'
+      default:
+        return 'grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-6'
+    }
+  }
+
   return (
     <motion.section
       className="mt-[20px] first:mt-0"
@@ -83,7 +101,7 @@ export function CategorySection({
 
       {/* Grid — staggered cards */}
       <motion.div
-        className="grid gap-[6px] grid-cols-3 xs:grid-cols-4 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8"
+        className={`grid gap-[10px] ${getGridColsClass(modules.length)}`}
         variants={cardContainer}
         initial="hidden"
         whileInView="show"

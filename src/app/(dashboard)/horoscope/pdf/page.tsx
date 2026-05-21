@@ -8,6 +8,7 @@ import { PlaceSearch } from '@/components/astro/PlaceSearch'
 import { CityData, HoroscopeResponse } from '@/types/astro'
 import { SanjeeviReport } from '@/components/astro/SanjeeviReport'
 import { Printer, ArrowLeft, Loader2, FileDown } from 'lucide-react'
+import api from '@/lib/api'
 
 export default function HoroscopePdfPage() {
   const { language } = useLanguage()
@@ -74,28 +75,22 @@ export default function HoroscopePdfPage() {
       const [hours, minutes] = tob.split(':').map(Number)
       
       const payload = {
-        year,
-        month,
-        day,
-        hour: hours,
-        minute: minutes,
+        date: dob,
+        time: tob,
         lat: selectedCity.latitude || selectedCity.lat,
         lng: selectedCity.longitude || selectedCity.lng,
-        tz_offset: selectedCity.utc_offset || 5.5
+        utcOffset: selectedCity.utc_offset || 5.5,
+        language: reportLanguage
       }
 
-      const baseUrl = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000'
-      const res = await fetch(`${baseUrl}/api/calc/horoscope`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
+      // 1. Calculate full horoscope via Express proxy
+      const horoRes = await api.post('/horoscope/calculate', payload)
 
-      if (!res.ok) {
-        throw new Error('API Error')
+      if (!horoRes.success || !horoRes.data) {
+        throw new Error('Horoscope calculation failed')
       }
 
-      const data = await res.json()
+      const data = horoRes.data
       setHoroscopeData(data)
       setShowReport(true)
     } catch (err) {

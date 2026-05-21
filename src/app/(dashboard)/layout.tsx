@@ -31,6 +31,13 @@ export default function DashboardLayout({
           .eq('id', session.user.id)
           .single()
 
+        // Call Express sync-meta endpoint to keep edge metadata updated
+        import('@/lib/api').then(({ default: api }) => {
+          api.get('/auth/sync-meta').catch(metaErr => {
+            console.error('Failed to sync metadata with backend:', metaErr);
+          });
+        });
+
         setUser({
           id: session.user.id,
           phone: session.user.phone ?? profile?.phone ?? '',

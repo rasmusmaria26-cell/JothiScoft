@@ -12,6 +12,9 @@ import { RasiChart } from '@/components/astro/RasiChart'
 import { DasaTable } from '@/components/astro/DasaTable'
 import { PredictionsTab } from '@/components/astro/PredictionsTab'
 import { CityData, HoroscopeResponse, DashaResponse, PlanetData } from '@/types/astro'
+import ErrorBoundary from '@/components/common/ErrorBoundary'
+import { HoroscopeSkeleton } from '@/components/astro/SkeletonCards'
+import api from '@/lib/api'
 
 export default function HoroscopePage() {
   const { language } = useLanguage()
@@ -163,31 +166,24 @@ export default function HoroscopePage() {
     setError(null)
 
     try {
-      const [year, month, day] = dob.split('-').map(Number)
-      const [hours, minutes] = tob.split(':').map(Number)
       const lat = selectedCity.lat !== undefined ? selectedCity.lat : selectedCity.latitude
       const lng = selectedCity.lng !== undefined ? selectedCity.lng : selectedCity.longitude
 
-      const baseUrl = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000'
-
-      // 1. Calculate full horoscope (Lagna, Rasi/Navamsam, Planet Positions)
-      const horoRes = await fetch(`${baseUrl}/api/calc/horoscope`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          year,
-          month,
-          day,
-          hour: hours,
-          minute: minutes,
-          lat,
-          lng,
-          tz_offset: selectedCity.utc_offset
-        })
+      // 1. Calculate full horoscope (Lagna, Rasi/Navamsam, Planet Positions) via Express proxy
+      const horoRes = await api.post('/horoscope/calculate', {
+        date: dob,
+        time: tob,
+        lat,
+        lng,
+        utcOffset: selectedCity.utc_offset || 5.5,
+        language: language || 'ta'
       })
 
-      if (!horoRes.ok) throw new Error('Horoscope API failed')
-      const horoData: HoroscopeResponse = await horoRes.json()
+      if (!horoRes.success || !horoRes.data) {
+        throw new Error('Horoscope calculation failed')
+      }
+
+      const horoData: HoroscopeResponse = horoRes.data
 
       // Find Moon's longitude to calculate dasa timeline
       const moonPlanet = horoData.planets.find(p => p.planet.toLowerCase() === 'moon')
@@ -201,18 +197,14 @@ export default function HoroscopePage() {
         ].indexOf(moonPlanet.sign)
         const moonLongitude = (moonSignIndex * 30) + moonPlanet.sign_degree
 
-        // 2. Fetch dasa timeline based on Moon longitude
-        const dasaRes = await fetch(`${baseUrl}/api/calc/dasha`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            birth_date: dob,
-            moon_longitude: moonLongitude
-          })
+        // 2. Fetch dasa timeline based on Moon longitude via Express proxy
+        const dasaRes = await api.post('/horoscope/dasha', {
+          birth_date: dob,
+          moon_longitude: moonLongitude
         })
 
-        if (dasaRes.ok) {
-          dasaData = await dasaRes.json()
+        if (dasaRes && dasaRes.timeline) {
+          dasaData = dasaRes as any
         }
       }
 
@@ -221,17 +213,14 @@ export default function HoroscopePage() {
 
       // 3. Optionally upsert user's profile if checkbox is checked
       if (saveToProfile && user) {
-        await supabase
-          .from('birth_profiles')
-          .upsert({
-            user_id: user.id,
-            name: name.trim() || 'My Profile',
-            dob: dob,
-            tob: `${tob}:00`,
-            lat: selectedCity.latitude,
-            lng: selectedCity.longitude,
-            place_name: `${selectedCity.name}, ${selectedCity.state || ''}`,
-          }, { onConflict: 'user_id' })
+        await api.post('/profile/birth-profiles', {
+          name: name.trim() || 'My Profile',
+          dob: dob,
+          tob: `${tob}:00`,
+          lat,
+          lng,
+          place_name: `${selectedCity.name}, ${selectedCity.state || selectedCity.country}`,
+        })
       }
 
     } catch (err) {
@@ -249,7 +238,8 @@ export default function HoroscopePage() {
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto py-4 px-4 sm:px-6">
+    <ErrorBoundary label="Horoscope failed to load.">
+      <div className="w-full max-w-7xl mx-auto py-4 px-4 sm:px-6">
       {/* Page Header */}
       <div className="mb-6">
         <h1 className="text-xl sm:text-3xl font-bold text-gold-bright flex items-center gap-2">
@@ -411,7 +401,9 @@ export default function HoroscopePage() {
         {/* Right Column: Calculations Report Display */}
         <div className="lg:col-span-8 w-full">
           <AnimatePresence mode="wait">
-            {!horoscope ? (
+            {isCalculating ? (
+              <HoroscopeSkeleton />
+            ) : !horoscope ? (
               <motion.div
                 key="empty-state"
                 initial={{ opacity: 0, y: 15 }}
@@ -613,6 +605,7 @@ export default function HoroscopePage() {
           </AnimatePresence>
         </div>
       </div>
-    </div>
+      </div>
+    </ErrorBoundary>
   )
 }

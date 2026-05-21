@@ -10,6 +10,7 @@ import { PredictionsTab } from '@/components/astro/PredictionsTab'
 import { HoroscopeResponse } from '@/types/astro'
 import { PlaceSearch } from '@/components/astro/PlaceSearch'
 import { CityData } from '@/types/astro'
+import api from '@/lib/api'
 
 export default function PalanPage() {
   const { language } = useLanguage()
@@ -54,15 +55,17 @@ export default function PalanPage() {
     setLoading(true)
     setError(null)
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000'
-      const res = await fetch(`${baseUrl}/api/calc/horoscope`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ year, month, day, hour, minute, lat, lng, tz_offset: 5.5 })
-      })
-      if (!res.ok) throw new Error('API Error')
-      const data = await res.json()
-      setHoroscope(data)
+      const payload = {
+        date: `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`,
+        time: `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`,
+        lat,
+        lng,
+        utcOffset: 5.5,
+        language
+      }
+      const horoRes = await api.post('/horoscope/calculate', payload)
+      if (!horoRes.success || !horoRes.data) throw new Error('API Error')
+      setHoroscope(horoRes.data)
     } catch (err) {
       console.error(err)
       setError(t.error)

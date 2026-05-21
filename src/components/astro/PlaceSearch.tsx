@@ -39,13 +39,13 @@ export function PlaceSearch({ onSelect, selectedCity, error }: PlaceSearchProps)
     }
   }, [query])
 
-  // Fetch cities via SWR
-  const baseUrl = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000'
+  // Fetch cities via SWR — calls the Express backend cities endpoint
+  const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'
   const shouldFetch = debouncedQuery.trim().length >= 1
   const { data: cities, error: fetchError, isLoading } = useSWR<CityData[]>(
-    shouldFetch ? `/api/cities?q=${encodeURIComponent(debouncedQuery)}` : null,
-    async (url: string) => {
-      const res = await fetch(`${baseUrl}${url}`)
+    shouldFetch ? `cities:${debouncedQuery}` : null,
+    async () => {
+      const res = await fetch(`${apiBase}/cities?q=${encodeURIComponent(debouncedQuery.trim())}`)
       if (!res.ok) throw new Error('Failed to fetch cities')
       return res.json()
     }

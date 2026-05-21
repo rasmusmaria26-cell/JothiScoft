@@ -6,6 +6,8 @@ import { ArrowLeft, RefreshCw, Feather, Clock, Search, Info } from 'lucide-react
 import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
 import { PlaceSearch } from '@/components/astro/PlaceSearch'
+import api from '@/lib/api'
+import ErrorBoundary from '@/components/common/ErrorBoundary'
 import { getBirdIcon } from '@/components/astro/BirdIcons'
 import { CityData } from '@/types/astro'
 
@@ -158,17 +160,10 @@ export default function PanchapakshiPage() {
         query_datetime: isoString || undefined
       }
 
-      const baseUrl = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000'
-      const response = await fetch(`${baseUrl}/api/calc/prasnam/panchapakshi`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
-
-      if (!response.ok) throw new Error('API failed')
+      const response = await api.post('/prasnam/panchapakshi', payload)
+      if (!response) throw new Error('API failed')
       
-      const data: PanchapakshiResponse = await response.json()
-      setResult(data)
+      setResult(response as any)
     } catch (err) {
       console.error(err)
       setError(labels.errorMessage)
@@ -178,7 +173,8 @@ export default function PanchapakshiPage() {
   }
 
   return (
-    <div className="max-w-[1000px] mx-auto flex flex-col gap-6">
+    <ErrorBoundary label="Panchapakshi biorhythms failed to load.">
+      <div className="max-w-[1000px] mx-auto flex flex-col gap-6">
       {/* Header back link */}
       <div className="flex items-center justify-between">
         <Link 
@@ -371,6 +367,7 @@ export default function PanchapakshiPage() {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+      </div>
+    </ErrorBoundary>
   )
 }

@@ -45,7 +45,6 @@ export const categoryData: CategorySectionProps[] = [
       { icon: Heart,       labelTa: 'நட்சத்திர பொருத்தம்', labelEn: 'Star Matching',  sublabelTa: 'Star Match',   sublabelEn: 'Star Match',   href: '/matching/star' },
       { icon: GitMerge,    labelTa: 'ஜாதக பொருத்தம்',      labelEn: 'Chart Matching', sublabelTa: 'Horoscope',    sublabelEn: 'Horoscope',    href: '/matching' },
       { icon: Search,      labelTa: 'விரிவான பொருத்தம்',   labelEn: 'Deep Match',     sublabelTa: 'Detailed',     sublabelEn: 'Detailed',     href: '/matching/detailed', badge: 'PRO' },
-      { icon: CheckCircle, labelTa: 'பொருத்தம் உண்மை',     labelEn: 'Premium Match',  sublabelTa: 'Premium',      sublabelEn: 'Premium',      href: '/matching/premium' },
     ],
   },
   {
@@ -68,8 +67,6 @@ export const categoryData: CategorySectionProps[] = [
       { icon: HelpCircle, labelTa: 'பிரஸ்னம் ஜாதகம்', labelEn: 'Prasnam Chart',  sublabelTa: 'Chart',       sublabelEn: 'Chart',       href: '/prasnam' },
       { icon: Zap,        labelTa: 'கடாரா பிரஸ்னம்',  labelEn: 'Katara Prasnam', sublabelTa: 'Katara',      sublabelEn: 'Katara',      href: '/prasnam/katara' },
       { icon: Bird,       labelTa: 'பஞ்சபட்சி',        labelEn: 'Pancha Pakshi',  sublabelTa: 'Pancha',      sublabelEn: 'Pancha',      href: '/prasnam/panchapakshi' },
-      { icon: Feather,    labelTa: 'பஞ்சி பலன் 1',     labelEn: 'Pakshi 1',       sublabelTa: 'Pakshi 1',    sublabelEn: 'Pakshi 1',    href: '/prasnam/pakshi1' },
-      { icon: Feather,    labelTa: 'பஞ்சி பலன் 2',     labelEn: 'Pakshi 2',       sublabelTa: 'Pakshi 2',    sublabelEn: 'Pakshi 2',    href: '/prasnam/pakshi2' },
     ],
   },
   {
@@ -85,7 +82,7 @@ export const categoryData: CategorySectionProps[] = [
       { icon: Star,       labelTa: 'கிருத்திகை',         labelEn: 'Krithigai',     sublabelTa: 'Krithigai',   sublabelEn: 'Krithigai',   href: '/special/krithigai' },
       { icon: Sun,        labelTa: 'உத்திரம்',            labelEn: 'Uthiram',       sublabelTa: 'Uthiram',     sublabelEn: 'Uthiram',     href: '/special/uthiram',   badge: 'NEW' },
       { icon: Gift,       labelTa: 'சித்திரைப்பிறப்பு',  labelEn: 'Tamil NY',      sublabelTa: 'Tamil NY',    sublabelEn: 'Tamil NY',    href: '/special/newyear',   badge: 'NEW' },
-      { icon: BookMarked, labelTa: 'தமிழ்ப் பஞ்சாங்கம்', labelEn: 'Tamil Panch.',  sublabelTa: 'Tamil Panch', sublabelEn: 'Tamil Panch', href: '/special/tamil',     badge: 'NEW' },
+      { icon: Flame,      labelTa: 'பிரதோஷம்',           labelEn: 'Pradosham',     sublabelTa: 'Pradosham',   sublabelEn: 'Pradosham',   href: '/special/pradosham' },
       { icon: Flame,      labelTa: 'ஜுவாலினி',           labelEn: 'Jwalini',       sublabelTa: 'Jwalini',     sublabelEn: 'Jwalini',     href: '/special/jwalini' },
     ],
   },

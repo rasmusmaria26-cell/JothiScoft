@@ -8,6 +8,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { useBirthProfile } from '@/hooks/useBirthProfile'
 import { NAKSHATRA_DATA, NakshatraInfo } from '@/data/nakshatraData'
 import { HoroscopeResponse } from '@/types/astro'
+import api from '@/lib/api'
 
 export default function StarReadingsPage() {
   const { language } = useLanguage()
@@ -57,16 +58,20 @@ export default function StarReadingsPage() {
         const lat = Number(birthProfile.lat)
         const lng = Number(birthProfile.lng)
 
-        const baseUrl = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000'
-        const res = await fetch(`${baseUrl}/api/calc/horoscope`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ year, month, day, hour, minute, lat, lng, tz_offset: 5.5 })
-        })
+        const payload = {
+          date: birthProfile.dob,
+          time: birthProfile.tob,
+          lat,
+          lng,
+          utcOffset: 5.5,
+          language: language || 'ta'
+        }
 
-        if (res.ok) {
-          const data: HoroscopeResponse = await res.json()
-          const moonPlanet = data.planets.find(p => p.planet === 'Moon')
+        const res = await api.post('/horoscope/calculate', payload)
+
+        if (res.success && res.data) {
+          const data: HoroscopeResponse = res.data
+          const moonPlanet = data.planets.find((p: any) => p.planet === 'Moon' || p.planet === 'சந்திரன்')
           if (moonPlanet?.nakshatra) {
             // Find key that matches or is close
             const matchedKey = Object.keys(NAKSHATRA_DATA).find(

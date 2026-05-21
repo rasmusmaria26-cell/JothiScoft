@@ -10,6 +10,9 @@ import { supabase } from '@/lib/supabase'
 import { PlaceSearch } from '@/components/astro/PlaceSearch'
 import { RasiChart } from '@/components/astro/RasiChart'
 import { CityData, HoroscopeResponse } from '@/types/astro'
+import ErrorBoundary from '@/components/common/ErrorBoundary'
+import { MatchingSkeleton } from '@/components/astro/SkeletonCards'
+import api from '@/lib/api'
 
 interface MatchingResponse {
   papasamyam: {
@@ -183,70 +186,48 @@ export default function HoroscopeMatchingPage() {
     setError(null)
 
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000'
-
-      const [boyYear, boyMonth, boyDay] = boyDob.split('-').map(Number)
-      const [boyH, boyM] = boyTob.split(':').map(Number)
       const boyLat = boyCity.lat !== undefined ? boyCity.lat : boyCity.latitude
       const boyLng = boyCity.lng !== undefined ? boyCity.lng : boyCity.longitude
 
-      // Step 1: Calculate Boy's Horoscope
+      // Step 1: Calculate Boy's Horoscope via Express proxy
       setCalcStep(1)
-      const boyRes = await fetch(`${baseUrl}/api/calc/horoscope`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          year: boyYear,
-          month: boyMonth,
-          day: boyDay,
-          hour: boyH,
-          minute: boyM,
-          lat: boyLat,
-          lng: boyLng,
-          tz_offset: boyCity.utc_offset
-        })
+      const boyRes = await api.post('/horoscope/calculate', {
+        date: boyDob,
+        time: boyTob,
+        lat: boyLat,
+        lng: boyLng,
+        utcOffset: boyCity.utc_offset || 5.5,
+        language: language || 'ta'
       })
-      if (!boyRes.ok) throw new Error('Failed groom calculations')
-      const boyData: HoroscopeResponse = await boyRes.json()
+      if (!boyRes.success || !boyRes.data) throw new Error('Failed groom calculations')
+      const boyData: HoroscopeResponse = boyRes.data
       setBoyHoro(boyData)
 
-      const [girlYear, girlMonth, girlDay] = girlDob.split('-').map(Number)
-      const [girlH, girlM] = girlTob.split(':').map(Number)
       const girlLat = girlCity.lat !== undefined ? girlCity.lat : girlCity.latitude
       const girlLng = girlCity.lng !== undefined ? girlCity.lng : girlCity.longitude
 
-      // Step 2: Calculate Girl's Horoscope
+      // Step 2: Calculate Girl's Horoscope via Express proxy
       setCalcStep(2)
-      const girlRes = await fetch(`${baseUrl}/api/calc/horoscope`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          year: girlYear,
-          month: girlMonth,
-          day: girlDay,
-          hour: girlH,
-          minute: girlM,
-          lat: girlLat,
-          lng: girlLng,
-          tz_offset: girlCity.utc_offset
-        })
+      const girlRes = await api.post('/horoscope/calculate', {
+        date: girlDob,
+        time: girlTob,
+        lat: girlLat,
+        lng: girlLng,
+        utcOffset: girlCity.utc_offset || 5.5,
+        language: language || 'ta'
       })
-      if (!girlRes.ok) throw new Error('Failed bride calculations')
-      const girlData: HoroscopeResponse = await girlRes.json()
+      if (!girlRes.success || !girlRes.data) throw new Error('Failed bride calculations')
+      const girlData: HoroscopeResponse = girlRes.data
       setGirlHoro(girlData)
 
-      // Step 3: Match Horoscopes
+      // Step 3: Match Horoscopes via Express proxy
       setCalcStep(3)
-      const matchRes = await fetch(`${baseUrl}/api/calc/matching/horoscope`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          boy_horoscope: boyData,
-          girl_horoscope: girlData
-        })
+      const matchRes = await api.post('/matching/calculate', {
+        boy_horoscope: boyData,
+        girl_horoscope: girlData
       })
-      if (!matchRes.ok) throw new Error('Failed matching comparison')
-      const matchingData: MatchingResponse = await matchRes.json()
+      if (!matchRes) throw new Error('Failed matching comparison')
+      const matchingData: MatchingResponse = matchRes as any
       setMatchResult(matchingData)
 
     } catch (err) {
@@ -259,7 +240,8 @@ export default function HoroscopeMatchingPage() {
   }
 
   return (
-    <div className="max-w-[1100px] mx-auto flex flex-col gap-6">
+    <ErrorBoundary label="Kundali matching failed to load.">
+      <div className="max-w-[1100px] mx-auto flex flex-col gap-6">
       {/* Header back link */}
       <div className="flex items-center justify-between">
         <Link 
@@ -269,7 +251,16 @@ export default function HoroscopeMatchingPage() {
           <ArrowLeft size={16} />
           {language === 'ta' ? 'முகப்புப்பக்கம்' : 'Back to Dashboard'}
         </Link>
-        <span className="text-[11px] font-mono text-text-muted">VERSION 4.0</span>
+        <div className="flex items-center gap-4">
+          <Link 
+            href="/matching/detailed"
+            className="text-xs font-bold bg-gold-deep/20 hover:bg-gold-deep/35 border border-gold-deep text-gold-bright px-3 py-1 rounded transition-all flex items-center gap-1.5"
+          >
+            <Sparkles size={12} className="text-gold-bright" />
+            {language === 'ta' ? 'விரிவான பொருத்தம் (Deep Match) ✦' : 'Deep Match Portal ✦'}
+          </Link>
+          <span className="text-[11px] font-mono text-text-muted">VERSION 4.0</span>
+        </div>
       </div>
 
       {/* Main Intro */}
@@ -284,7 +275,9 @@ export default function HoroscopeMatchingPage() {
       </div>
 
       <AnimatePresence mode="wait">
-        {!matchResult ? (
+        {isCalculating ? (
+          <MatchingSkeleton />
+        ) : !matchResult ? (
           <motion.div
             key="input-form"
             initial={{ opacity: 0, y: 15 }}
@@ -621,6 +614,7 @@ export default function HoroscopeMatchingPage() {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+      </div>
+    </ErrorBoundary>
   )
 }

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import Script from "next/script";
 
 export const metadata: Metadata = {
   title: "JothiSoft | Professional Tamil Astrology",
@@ -13,6 +14,8 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
 };
+
+import ToastContainer from "@/components/common/ToastContainer";
 
 export default function RootLayout({
   children,
@@ -28,6 +31,11 @@ export default function RootLayout({
       </head>
       <body className="font-sans antialiased selection:bg-gold-deep selection:text-text-inverse">
         {children}
+        <ToastContainer />
+        <Script
+          src="https://checkout.razorpay.com/v1/checkout.js"
+          strategy="lazyOnload"
+        />
       </body>
     </html>
   );

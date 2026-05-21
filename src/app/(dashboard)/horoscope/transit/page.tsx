@@ -7,6 +7,7 @@ import { ArrowLeft, Navigation, Sparkles, Loader2, Info, Compass, ShieldAlert, H
 import { useLanguage } from '@/context/LanguageContext'
 import { useBirthProfile } from '@/hooks/useBirthProfile'
 import { HoroscopeResponse } from '@/types/astro'
+import api from '@/lib/api'
 
 const RASI_LIST = [
   { id: 'Mesha', en: 'Aries', ta: 'மேஷம்' },
@@ -110,16 +111,20 @@ export default function TransitPalanPage() {
         const lat = Number(birthProfile.lat)
         const lng = Number(birthProfile.lng)
 
-        const baseUrl = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000'
-        const res = await fetch(`${baseUrl}/api/calc/horoscope`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ year, month, day, hour, minute, lat, lng, tz_offset: 5.5 })
-        })
+        const payload = {
+          date: birthProfile.dob,
+          time: birthProfile.tob,
+          lat,
+          lng,
+          utcOffset: 5.5,
+          language: language || 'ta'
+        }
 
-        if (res.ok) {
-          const data: HoroscopeResponse = await res.json()
-          const moonPlanet = data.planets.find(p => p.planet === 'Moon')
+        const res = await api.post('/horoscope/calculate', payload)
+
+        if (res.success && res.data) {
+          const data: HoroscopeResponse = res.data
+          const moonPlanet = data.planets.find((p: any) => p.planet === 'Moon' || p.planet === 'சந்திரன்')
           if (moonPlanet?.sign) {
             const matchedRasi = RASI_LIST.find(
               r => r.id.toLowerCase() === moonPlanet.sign.toLowerCase() ||
@@ -145,11 +150,9 @@ export default function TransitPalanPage() {
       setLoading(true)
       setError(null)
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000'
-        const res = await fetch(`${baseUrl}/api/calc/transit?rasi=${selectedRasi}`)
-        if (!res.ok) throw new Error('Failed to fetch transit data')
-        const data = await res.json()
-        setTransitData(data)
+        const res = await api.get(`/horoscope/transit?rasi=${selectedRasi}`)
+        if (!res.success || !res.data) throw new Error('Failed to fetch transit data')
+        setTransitData(res.data)
       } catch (err) {
         console.error(err)
         setError(isTa ? 'கோச்சார விவரங்களைப் பெறுவதில் பிழை' : 'Error retrieving live transit details')

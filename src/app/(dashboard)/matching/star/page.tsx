@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Heart, ArrowLeft, RefreshCw, CheckCircle2, XCircle, AlertTriangle, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
+import api from '@/lib/api'
 
 // List of the 27 Nakshatras in English (must match backend) and Tamil
 const NAKSHATRAS = [
@@ -168,22 +169,16 @@ export default function StarMatchingPage() {
     setError(null)
 
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000'
-      const response = await fetch(`${baseUrl}/api/calc/matching/star`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          boy_star: boyStar,
-          girl_star: girlStar
-        })
+      const response = await api.post('/matching/star', {
+        boy_star: boyStar,
+        girl_star: girlStar
       })
 
-      if (!response.ok) {
+      if (!response) {
         throw new Error('Matching API failed')
       }
 
-      const data = await response.json()
-      setResult(data)
+      setResult(response as any)
     } catch (err) {
       console.error(err)
       setError(labels.errorMessage)

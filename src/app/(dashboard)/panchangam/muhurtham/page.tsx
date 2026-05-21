@@ -7,6 +7,8 @@ import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
 import { MuhurthamDay } from '@/types/muhurtham'
 import { MuhurthamDetailsModal } from '@/components/astro/MuhurthamDetailsModal'
+import ErrorBoundary from '@/components/common/ErrorBoundary'
+import api from '@/lib/api'
 
 const CATEGORIES = [
   { id: 'general', name_en: 'General', name_ta: 'பொது சுப நாட்கள்', icon: Sparkles, color: 'text-[#f2c96a] border-[#c9922a]/40 bg-[#c9922a]/10' },
@@ -41,24 +43,14 @@ export default function MuhurthamPage() {
         const year = currentDate.getFullYear()
         const month = currentDate.getMonth() + 1 // 1-indexed
 
-        const apiBase = process.env.NEXT_PUBLIC_FASTAPI_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
-        const response = await fetch(`${apiBase}/api/calc/muhurtham`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            year,
-            month,
-            category: activeCategory,
-            lat: 13.0827, // Chennai default
-            lng: 80.2707,
-          }),
+        const data = await api.post<MuhurthamDay[]>('/panchangam/muhurtham', {
+          year,
+          month,
+          category: activeCategory,
+          lat: 13.0827, // Chennai default
+          lng: 80.2707,
         })
 
-        if (!response.ok) {
-          throw new Error('Failed to compute auspicious days')
-        }
-
-        const data = await response.json()
         setDays(data)
       } catch (err) {
         console.error(err)
@@ -151,7 +143,8 @@ export default function MuhurthamPage() {
   }
 
   return (
-    <div className="max-w-[1200px] mx-auto flex flex-col gap-6 font-sans">
+    <ErrorBoundary label="Muhurtham checker failed to load.">
+      <div className="max-w-[1200px] mx-auto flex flex-col gap-6 font-sans">
       {/* Header link */}
       <div className="flex items-center justify-between">
         <Link
@@ -366,6 +359,7 @@ export default function MuhurthamPage() {
         language={language}
         categoryName={activeCategoryLabel || ''}
       />
-    </div>
+      </div>
+    </ErrorBoundary>
   )
 }

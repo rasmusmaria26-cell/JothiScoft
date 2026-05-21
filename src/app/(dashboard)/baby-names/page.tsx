@@ -5,8 +5,10 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { ArrowLeft, Baby, Sparkles, Loader2, Heart, Search, Filter, HelpCircle, Check, Info } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
+import api from '@/lib/api'
 import { useBirthProfile } from '@/hooks/useBirthProfile'
 import { CuratedBabyNames, SYLLABLE_MAPPING, BabyNameItem } from '@/data/babyNames'
+import ErrorBoundary from '@/components/common/ErrorBoundary'
 import { HoroscopeResponse } from '@/types/astro'
 
 const containerVariants = {
@@ -72,21 +74,20 @@ export default function BabyNamesPage() {
       if (!birthProfile) return
       setLoading(true)
       try {
-        const [year, month, day] = birthProfile.dob.split('-').map(Number)
-        const [hour, minute] = birthProfile.tob.split(':').map(Number)
         const lat = Number(birthProfile.lat)
         const lng = Number(birthProfile.lng)
 
-        const baseUrl = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000'
-        const res = await fetch(`${baseUrl}/api/calc/horoscope`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ year, month, day, hour, minute, lat, lng, tz_offset: 5.5 })
+        const res = await api.post<any>('/horoscope/calculate', {
+          date: birthProfile.dob,
+          time: birthProfile.tob,
+          lat,
+          lng,
+          utcOffset: 5.5
         })
 
-        if (res.ok) {
-          const data: HoroscopeResponse = await res.json()
-          const moonPlanet = data.planets.find(p => p.planet === 'Moon')
+        if (res?.success) {
+          const data: HoroscopeResponse = res.data
+          const moonPlanet = data.planets.find((p: any) => p.planet === 'Moon')
           if (moonPlanet?.nakshatra) {
             // Find key matching nakshatra
             const matchedKey = Object.keys(SYLLABLE_MAPPING).find(
@@ -154,7 +155,8 @@ export default function BabyNamesPage() {
   }
 
   return (
-    <div className="w-full max-w-5xl mx-auto flex flex-col gap-6">
+    <ErrorBoundary label="Baby names suggestor failed to load.">
+      <div className="w-full max-w-5xl mx-auto flex flex-col gap-6">
       {/* Header */}
       <div className="flex flex-col gap-2">
         <Link href="/" className="inline-flex items-center gap-2 text-text-muted hover:text-gold-bright transition-colors text-sm font-medium">
@@ -431,6 +433,7 @@ export default function BabyNamesPage() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </ErrorBoundary>
   )
 }
